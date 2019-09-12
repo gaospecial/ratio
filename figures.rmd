@@ -3,6 +3,8 @@ title: "Figures of the Ratio manuscript"
 author: "gaospecial@gmail.com"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
+  md_document:
+    variant: markdown_github
   html_document:
     fig_caption: yes
     theme: paper
@@ -169,8 +171,7 @@ plot_grid(p1,
 library(kableExtra)
 left_join(carbon_name,carbon_group) %>% 
   left_join(carbon_prefer) %>% 
-  kable() %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
+  kable()
 ```
 
 # Figure 2
@@ -207,15 +208,13 @@ p2 <- ggplot(
 
 plots <- lapply(list(p1,p2),function(x){
   x + geom_boxplot() + geom_jitter() +
-    geom_text(aes(x="equal", y=0.9,label= paste("p.adj = ",p.adj)),check_overlap = T) +
-    geom_text(aes(x="equal",y=.001,label=carbon_id),color="grey",size=3) +
+    geom_text(aes(x="equal", y=0.55,label= paste("p.adj = ",p.adj)),check_overlap = T) +
+    geom_text(aes(x="less",y=.65,label=carbon_id),color="grey",size=3) +
     facet_wrap(~carbon_id,
                ncol=5,
                labeller = labeller(carbon_id=carbon_name_labeller)) + 
     # stat_compare_means(method="aov") +
-    labs(x="",y="final ratio (EC/PP)") +
-    scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),
-                  labels=c("0.001","0.01","0.1","1","10"))
+    labs(x="",y="final ratio (EC/PP)")
 })
 
 
@@ -244,7 +243,7 @@ p2 <- ggplot(freq,aes(Var1,Freq)) + geom_col() +
 library(grid)
 vp <- viewport(width=0.4,height=0.6,x=0.7,y=0.6)
 pushViewport(vp)
-print(p1)
+p1
 print(p2,vp=vp)
 ```
 
@@ -255,7 +254,7 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
   geom_text(aes(x="equal",y=.001,label=carbon_id),color="grey",vjust=1,size=3,show.legend = F) +
   # ggpubr::stat_compare_means(method="aov",label="p.signif") +
   facet_wrap(~carbon_id) +
-  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
+  # scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
   xlab("") + ylab("final ratio (EC/PP)") +
   theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
       legend.position = "top",
@@ -300,14 +299,14 @@ p1 <- left_join(qPCR_data,carbon_prefer) %>% ggplot(aes(x=prefer,y=ratio1)) +
   facet_wrap(~ratio0) + 
   stat_compare_means(method="wilcox.test",comparisons = list(c("EC","none"),c("none","PP"),c("EC","PP"))) +
   labs(x="type of carbon perference", y="final ratio (EC/PP)") +
-  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10"))
+  ylim(c(NA,1.5))
 
 p2 <- left_join(qPCR_data,carbon_prefer) %>% ggplot(aes(x=ratio0,y=ratio1)) + 
   geom_boxplot() + 
   facet_wrap(~prefer) + 
   stat_compare_means(method="wilcox.test",comparisons = list(c("less","equal"),c("equal","more"),c("less","more"))) +
   labs(x="inital ratio (EC/PP)", y="final ratio (EC/PP)") +
-  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10"))
+  ylim(c(NA,1.5))
 ```
 
 
@@ -469,7 +468,7 @@ u2_p2 <- left_join(qPCR_data,carbon_group) %>%
              labeller = labeller(carbon_id=carbon_name_labeller)) + 
   # stat_compare_means(method="aov") +
   labs(x="",y="final ratio (EC/PP)") +
-  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
+  # scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
   theme(axis.text.x = element_text(angle = 45,hjust = 1,vjust = 1)  )
 ```
 
@@ -597,3 +596,5 @@ ggplot(biolog_with_social,aes(ratio0,A750,color=social_type)) +
           strip.background = element_blank(),  # remove facet label - "strip"
           strip.text = element_blank())
 ```
+
+
