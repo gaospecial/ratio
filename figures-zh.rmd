@@ -3,11 +3,11 @@ title: "Figures of the Ratio manuscript"
 author: "gaospecial@gmail.com"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  md_document:
-    variant: markdown_github
   html_document:
     fig_caption: yes
     theme: paper
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -42,7 +42,7 @@ head(qPCR_data)
 
 每一行`biolog`数据中包含了初始接种比例（`ratio0`），实验编号（`plate`），碳源的编号，24h时的碳源利用情况（`A750`）等信息。
 
-每一行的qPCR数据中包含了初始接种比例（`ratio0`），实验编号（`plate`），碳源编号（`carbon_id`），*E. coli*的定量结果（`EC`），*P. putida*的定量结果（`PP`），以及最终的物种比例（`ratio1`）。
+每一行的qPCR数据中包含了初始接种比例（`ratio0`），实验编号（`plate`），碳源编号（`carbon_id`），*E. coli* 的定量结果（`EC`），*P. putida* 的定量结果（`PP`），以及最终的物种比例（`ratio1`）。
 
 最后，读取碳源的名称。
 
@@ -75,7 +75,7 @@ biolog_coculture_24h <- biolog_24h %>%
 
 ## 对碳源进行聚类
 
-定义碳源利用的分组：U1，U2，U3.其中U2是共培养体系中新获得对9种碳源的利用能力。
+定义碳源利用的分组：U1，U2，U3。分组采用了层级聚类方法，将碳源分为三类。参见 \@ref(table1)。
 
 ```{r defining_carbon_usage}
 M_A750_24h <- biolog_24h %>% mutate(sample=paste(ratio0,plate,sep="-")) %>%
@@ -91,6 +91,9 @@ carbon_group <-  data.frame(usage=k3) %>%
 ```
 
 ## 定义碳源偏好性
+
+根据 *E. coli* 和 *P.putida* 在单独培养时利用碳源能力的差异，将碳源又分为 *E. coli* 偏好性碳源、 *P. putida* 偏好性碳源及其它碳源。参见 \@ref(table1)。
+
 
 ```{r defining_carbon_prefer}
 biolog_mono_A750_24h <- biolog_mono_24h %>% 
@@ -113,13 +116,14 @@ carbon_prefer[carbon_prefer$carbon_id %in% EC_prefered$carbon_id,"prefer"] <- "E
 carbon_prefer[carbon_prefer$carbon_id %in% PP_prefered$carbon_id,"prefer"] <- "PP"
 ```
 
-# the scheme using to define social behaviours in coculture
+# 根据碳源利用效率定义相互作用关系 {#model}
 
-Social behaviours is affected by inital ratios.
 
 相互作用通常被认为是物种间的固有属性。负的相互作用可能来自于底物竞争、抗生素的合成等，而正的相互作用可能来自于代谢的耦联等。
 
-```{r definition_of_social_type,fig.width=6,fig.asp=1}
+对于共培养体系而言，其总的碳源利用效率与其中包括的两个物种的碳源利用能力和它们在体系中所占的比例相关。在最简单的情况下，如果总的碳源利用效率高于单独培养时最大的碳源利用效率，那么显然是正的相互作用；如果总的碳源利用效率低于单独培养时最小的碳源利用效率，那么则显然是负的相互作用。但是，实际上共培养体系的碳源利用效率较少出现这两种情况，而多介于最大和最小之间，这时就需要综合考虑两个物种所占有的比例。基于这一思考，我们提出了下列理论模型。
+
+```{r definition_of_social_type,fig.width=6,fig.asp=1, echo=F}
 
 p1 <- ggplot(data.frame(x=c("A","B"),y=c(5,3),fill=c("A","B"),label=c("A","B")),aes(x,y,fill=fill)) + 
   geom_bar(stat = "identity") +
@@ -165,16 +169,20 @@ plot_grid(p1,
           ncol=2,rel_widths = c(1,2))
 ```
 
-# Table 1
+# Table 1 碳源及其分类 {#table1}
 
-```{r}
+Table 1 包括了实验中的71中碳源的编号、名称，及按照前述分类指标的分类情况。
+
+```{r table1}
 library(kableExtra)
 left_join(carbon_name,carbon_group) %>% 
   left_join(carbon_prefer) %>% 
   kable()
 ```
 
-# Figure 2
+# Figure 2 共培养体系中最终比例的差异 {#fig2}
+
+Figure 2 主要展示了共培养体系中最终比例的差异。最终比例以 *E. coli* 与 *P. putida* 定量结果的比值为依据。采用 **ANOVA** 分析三个共培养体系的最终比例是否有差异。P值使用 “BH” 方法做矫正。
 
 ```{r}
 aov_p <- compare_means(ratio1~ratio0,
@@ -186,7 +194,7 @@ aov_p <- compare_means(ratio1~ratio0,
 
 ```
 
-
+为了展示结果，针对于存在显著差异和不存在显著差异的结果，分别选择了5个典型作为示例。
 
 ```{r fig.asp=0.8,fig.width=6}
 
@@ -221,7 +229,9 @@ plots <- lapply(list(p1,p2),function(x){
 plot_grid(plotlist = plots,ncol=1,labels="AUTO")
 ```
 
-```{r fig.width=6,fig.asp=0.618}
+同时，在子图中展示了P值的分布情况。
+
+```{r fig.width=0.1,fig.asp=0.1}
 p.cutoff <- 0.05
 p1 <- ggplot(aov_p,aes(p.adj)) + 
   # geom_histogram(bins=30) + 
@@ -243,17 +253,25 @@ p2 <- ggplot(freq,aes(Var1,Freq)) + geom_col() +
 library(grid)
 vp <- viewport(width=0.4,height=0.6,x=0.7,y=0.6)
 pushViewport(vp)
+```
+
+
+```{r fig.width=6,fig.asp=0.618}
 p1
 print(p2,vp=vp)
 ```
 
 # Figure S2. Final ratios of all cultures
 
+与\@ref(fig2) 对应，Figure S2展示了全部共培养体系的最终比例差异。
+
 ```{r fig.asp=1,fig.width=6}
 ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
   geom_text(aes(x="equal",y=.001,label=carbon_id),color="grey",vjust=1,size=3,show.legend = F) +
   # ggpubr::stat_compare_means(method="aov",label="p.signif") +
   facet_wrap(~carbon_id) +
+  # geom_jitter() +
+  geom_text(aes(x="equal", y=1,label= p.adj),check_overlap = T, data=aov_p) +
   # scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
   xlab("") + ylab("final ratio (EC/PP)") +
   theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
@@ -265,9 +283,13 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
 
 
 
-# Figure 3. CUE of monoculture in preferred carbon sources
+# Figure 3. 碳源偏好性对共培养体系最终比例的影响
 
+Figure 3展示了碳源偏好性对共培养体系最终比例的影响。
 
+这个影响可以从两个方面来看，一是对于一个确定初始比例的共培养体系，由于碳源偏好性的差异，可以得到：在*E. coli*偏好性的碳源中生长有利于提高最终比例；在 *P. putida* 偏好性的碳源中生长则有利于降低最终比例。
+
+另一方面，是在碳源确定的情况下，我们发现，在 *E. coli* 偏好性的碳源中，初始比例差异较大的三个共培养体系的最终比例趋于一致。其总体上差异已经不再显著。而在其它类型碳源中则没有观察到这一现象。
 
 ```{r}
 p <- left_join(biolog_mono_24h,carbon_prefer) %>% 
@@ -317,7 +339,13 @@ plot_grid(gp,plot_grid(p1,p2,labels = c("B","C"),ncol = 2),labels = c("A",""),nc
 
 
 
-# Figure 4. Co-existance enhances CUE
+# Figure 4. 初始比例对共培养体系代谢能力的调控
+
+在接下来的分析中，我们把三个共培养体系视为一个简单的合成群落，通过分析群落对71种碳源的利用能力比较群落功能的差异。
+
+首先，我们分析3个共培养体系CUE的数值分布是不同的。中位数的比较可以窥其一斑。PCA的结果则明确指出了“equal”和“more”的共培养体系具有与单独培养体系和“less”共培养体系完全不同的CUE谱。这一结果在热图中进一步得到体现。
+
+由此，我们可以发现，U2类的碳源在“equal”和“more”中的利用效率显著提高。而在“less”中没有这种现象。说明初始比例的差异最终能够导致群落功能上走向不同的终点。
 
 ```{r coculture_enhance_CUE, fig.width=5,fig.asp=0.618}
 p_cue <- ggplot(biolog_24h,aes(ratio0,A750)) + 
@@ -335,9 +363,10 @@ p_cue <- ggplot(biolog_24h,aes(ratio0,A750)) +
   labs(x="initial ratio (EC/PP)",y="CUE")
 ```
 
-# Clustering of CUE profiles
+
 
 ```{r}
+# 定义一个在PCA图中绘制置信区间的函数
 add_ellipase <- function(p, x="PC1", y="PC2", group="group",
                          ellipase_pro = 0.95,
                          linetype="dashed",
@@ -415,7 +444,9 @@ plot_grid(plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B")),
 ```
 
 
-# Figure 5.Final ratio and CUE in U2 carbon sources
+# Figure 5. Final ratio and CUE in U2 carbon sources
+
+由于U2类碳源表现了独特现象。我们列出U2类碳源中的CUE和最终比例。
 
 ```{r}
 biolog_24h_U2 <- left_join(biolog_24h,carbon_group) %>% filter(usage=="U2") 
@@ -472,11 +503,13 @@ u2_p2 <- left_join(qPCR_data,carbon_group) %>%
   theme(axis.text.x = element_text(angle = 45,hjust = 1,vjust = 1)  )
 ```
 
-```{r fig.asp=1.8,fig.width=5}
+```{r fig5, fig.asp=1.8,fig.width=5}
 plot_grid(u2_p1,u2_p2,labels = "AUTO",ncol=1)
 ```
 
-# Figure S3
+# Figure S3 所有体系的 CUE
+
+与\@ref(fig:fig5) 对应，Figure S3展示了所有的CUE利用情况及差异。
 
 ```{r fig.asp=1,fig.width=6}
 ggplot(biolog_24h, aes(ratio0,A750)) + 
@@ -494,9 +527,11 @@ ggplot(biolog_24h, aes(ratio0,A750)) +
 ```
 
 
-# initial ratio affect social behaviours
+# Figure 6. 初始比例对相互作用的影响
 
-## Define social behaviours using A750
+## 计算相互作用类型
+
+定义相互作用的类型。首先，根据 monoculture 的 CUE 和 coculture 中的物种比例，计算理论值。然后，拿理论CUE值与实际测得的值进行比较，从而确定相互作用类型。
 
 ```{r}
 ratio1 <- qPCR_data %>% filter(ratio0 %in% c("less","equal","more")) %>%
@@ -579,8 +614,9 @@ plot_grid(plot_grid(blank, plots[[1]], legend, rel_widths = c(0.3,0.8,0.7),ncol=
 ```
 
 
-# Figure S4
+# Figure S4 所有体系中的相互作用类型
 
+Figure S4 与 Figure 6 对应，展示所有组合中的相互作用类型。
 
 ```{r fig.asp=1.2,fig.width=6}
 ggplot(biolog_with_social,aes(ratio0,A750,color=social_type)) + 
