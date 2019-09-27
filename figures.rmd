@@ -8,10 +8,21 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = T)
-knitr::opts_chunk$set(fig.width = 8,fig.asp=0.618,message = F,dpi = 300)
+knitr::opts_chunk$set(
+  fig.width = 8,
+  fig.asp=0.618,
+  message = F,
+  dpi = 300,
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "figures/Figure-",
+  out.width = "70%"
+)
+```
 
+# load packages
 
+```{r packages}
 library(tidyverse)
 library(cowplot)
 library(ggpubr)
