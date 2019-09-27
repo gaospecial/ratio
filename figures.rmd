@@ -371,7 +371,7 @@ p_cue <- ggplot(biolog_24h,aes(ratio0,A750)) +
 
 
 ```{r}
-# 定义一个在PCA图中绘制置信区间的函数
+# add confidential levels in PCA 
 add_ellipase <- function(p, x="PC1", y="PC2", group="group",
                          ellipase_pro = 0.95,
                          linetype="dashed",
@@ -562,11 +562,6 @@ social <- biolog_coculture_24h %>% select(plate,carbon_id,ratio0,A750) %>%
   summarise(p_pos=t.test(x=A750,y=A750_cac,alternative = "greater")$p.value,
             p_neg=t.test(x=A750,y=A750_cac,alternative = "less")$p.value)
 
-# social$p_pos.adj <- p.adjust(social$p_pos,method = "BH")
-# social$p_neg.adj <- p.adjust(social$p_neg,method = "BH")
-
-# 没有同时显著的情况
-# any(social$p_neg.adj < 0.05 & social$p_pos.adj < 0.05)
 
 social <- social %>%
   mutate(social_type=ifelse(
