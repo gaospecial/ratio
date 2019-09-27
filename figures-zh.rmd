@@ -3,18 +3,26 @@ title: "Figures of the Ratio manuscript"
 author: "gaospecial@gmail.com"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  html_document:
-    fig_caption: yes
-    theme: paper
   md_document:
     variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = T)
-knitr::opts_chunk$set(fig.width = 8,fig.asp=0.618,message = F,dpi = 300)
+knitr::opts_chunk$set(
+  fig.width = 8,
+  fig.asp=0.618,
+  message = F,
+  dpi = 300,
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "figures/Figure-",
+  out.width = "70%"
+)
+```
 
+# load packages
 
+```{r packages}
 library(tidyverse)
 library(cowplot)
 library(ggpubr)
