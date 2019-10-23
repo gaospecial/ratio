@@ -180,6 +180,8 @@ plot_grid(p1,
           plot_grid(plotlist = plots,ncol = 2,labels = c("B","C")),
           labels = c("A",""),
           ncol=2,rel_widths = c(1,2))
+
+ggsave("figure 1.tiff",path="figures")
 ```
 
 # Table 1 The list of 71 carbon sources used in this study {#table1}
@@ -240,6 +242,7 @@ plots <- lapply(list(p1,p2),function(x){
 
 
 plot_grid(plotlist = plots,ncol=1,labels="AUTO")
+ggsave("figure 2.tiff",path="figures")
 ```
 
 ## Figure 2C
@@ -272,6 +275,7 @@ pushViewport(vp)
 ```{r fig.width=6,fig.asp=0.618}
 p1
 print(p2,vp=vp)
+ggsave("figure 2C.tiff",path="figures")
 ```
 
 # Figure S2. Final ratios of all cultures
@@ -292,6 +296,7 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
       legend.direction = "horizontal",
       strip.background = element_blank(),  # remove facet label - "strip"
       strip.text = element_blank())
+ggsave("figure S2.tiff",path="figures")
 ```
 
 
@@ -343,6 +348,7 @@ p2 <- left_join(qPCR_data,carbon_prefer) %>% ggplot(aes(x=ratio0,y=ratio1)) +
 
 ```{r,fig.asp=1.1,fig.width=8}
 plot_grid(gp,plot_grid(p1,p2,labels = c("B","C"),ncol = 2),labels = c("A",""),ncol = 1,rel_heights = c(1.5,1))
+ggsave("figure 3.tiff",path="figures")
 ```
 
 
@@ -446,6 +452,7 @@ p_heatmap <- pheatmap(t(M_A750_24h),
 plot_grid(plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B")),
           ggplotify::as.ggplot(p_heatmap),ncol = 1,labels = c("","C"),
           rel_heights = c(0.8,1))
+ggsave("figure 4.tiff",path="figures")
 ```
 
 
@@ -510,6 +517,7 @@ u2_p2 <- left_join(qPCR_data,carbon_group) %>%
 
 ```{r fig5, fig.asp=1.8,fig.width=5}
 plot_grid(u2_p1,u2_p2,labels = "AUTO",ncol=1)
+ggsave("figure 5.tiff",path="figures")
 ```
 
 # Figure S3 The results of CUE for all combinations
@@ -529,6 +537,7 @@ ggplot(biolog_24h, aes(ratio0,A750)) +
         legend.direction = "horizontal",
         strip.background = element_blank(),  # remove facet label - "strip"
         strip.text = element_blank())
+ggsave("figure S3.tiff",path="figures")
 ```
 
 
@@ -612,7 +621,7 @@ plot_grid(plot_grid(blank, plots[[1]], legend, rel_widths = c(0.3,0.8,0.7),ncol=
           plots[[3]] + facet_wrap(~prefer),
           ncol=1,
           labels = c("AUTO"))
-          
+ggsave("figure 6.tiff",path="figures")
 ```
 
 
@@ -633,6 +642,7 @@ ggplot(biolog_with_social,aes(ratio0,A750,color=social_type)) +
           legend.position = "top",
           strip.background = element_blank(),  # remove facet label - "strip"
           strip.text = element_blank())
+ggsave("figure S4.tiff",path="figures")
 ```
 
 

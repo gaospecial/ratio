@@ -1197,6 +1197,8 @@ aov_p <- compare_means(ratio1~ratio0,
                        method = "anova",
                        p.adjust.method = "BH") %>% 
   arrange(p.adj)
+#> Warning: `cols` is now required.
+#> Please use `cols = c(p)`
 ```
 
 Figure 2A, B
@@ -1237,6 +1239,10 @@ plot_grid(plotlist = plots,ncol=1,labels="AUTO")
 
 <img src="figures/Figure-unnamed-chunk-5-1.png" width="70%" />
 
+``` r
+ggsave("figure 2.tiff",path="figures")
+```
+
 Figure 2C
 ---------
 
@@ -1273,6 +1279,10 @@ print(p2,vp=vp)
 
 <img src="figures/Figure-unnamed-chunk-7-1.png" width="70%" />
 
+``` r
+ggsave("figure 2C.tiff",path="figures")
+```
+
 Figure S2. Final ratios of all cultures
 =======================================
 
@@ -1295,6 +1305,10 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
 ```
 
 <img src="figures/Figure-unnamed-chunk-8-1.png" width="70%" />
+
+``` r
+ggsave("figure S2.tiff",path="figures")
+```
 
 Figure 3. carbon preferences
 ============================
@@ -1355,6 +1369,10 @@ plot_grid(gp,plot_grid(p1,p2,labels = c("B","C"),ncol = 2),labels = c("A",""),nc
 ```
 
 <img src="figures/Figure-unnamed-chunk-11-1.png" width="70%" />
+
+``` r
+ggsave("figure 3.tiff",path="figures")
+```
 
 Figure 4. Initial ratio regulate carbon usage profiles
 ======================================================
@@ -1462,6 +1480,10 @@ plot_grid(plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B")),
 
 <img src="figures/Figure-unnamed-chunk-15-1.png" width="70%" />
 
+``` r
+ggsave("figure 4.tiff",path="figures")
+```
+
 Figure 5. Final ratio and CUE in U2 carbon sources
 ==================================================
 
@@ -1528,6 +1550,10 @@ plot_grid(u2_p1,u2_p2,labels = "AUTO",ncol=1)
 
 <img src="figures/Figure-fig5-1.png" width="70%" />
 
+``` r
+ggsave("figure 5.tiff",path="figures")
+```
+
 Figure S3 The results of CUE for all combinations
 =================================================
 
@@ -1549,6 +1575,10 @@ ggplot(biolog_24h, aes(ratio0,A750)) +
 ```
 
 <img src="figures/Figure-unnamed-chunk-19-1.png" width="70%" />
+
+``` r
+ggsave("figure S3.tiff",path="figures")
+```
 
 Figure 6. Effect of mixing in cocultures.
 =========================================
@@ -1634,6 +1664,10 @@ plot_grid(plot_grid(blank, plots[[1]], legend, rel_widths = c(0.3,0.8,0.7),ncol=
 
 <img src="figures/Figure-social_vs_groups_barplot-1.png" width="70%" />
 
+``` r
+ggsave("figure 6.tiff",path="figures")
+```
+
 Figure S4 The effect of mixing of all combinations
 ==================================================
 
@@ -1655,3 +1689,7 @@ ggplot(biolog_with_social,aes(ratio0,A750,color=social_type)) +
 ```
 
 <img src="figures/Figure-unnamed-chunk-23-1.png" width="70%" />
+
+``` r
+ggsave("figure S4.tiff",path="figures")
+```
