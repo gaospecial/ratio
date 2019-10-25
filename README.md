@@ -1,6 +1,6 @@
 The repository [ratio](https://github.com/gaospecial/ratio) contains the supplementary files of a recent manuscript.
 
-**Chun-Hui Gao**, Hui Cao, Yichao Wu, Søren J. Sørensen*, Peng Cai*, 
+**Chun-Hui Gao**, Hui Cao, Peng Cai*, Søren J. Sørensen, 
 Dissecting the impact of initial inoculation ratio on the structure, function and interaction in a coculture system.
 In submission.
 
