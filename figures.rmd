@@ -3,6 +3,12 @@ title: "Figures 1-6 and S2-S4 of the Ratio manuscript"
 author: "gaospecial@gmail.com"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
   md_document:
     variant: markdown_github
 ---
@@ -42,7 +48,7 @@ Raw data were stored in the `data` folder. It mainly comes from two experiments:
 
 
 ```{r}
-biolog_24h <- read_csv("data/biolog.csv")
+biolog <- read_csv("data/biolog.csv")
 qPCR_data <- read_csv(file="data/qPCR.csv")
 head(biolog_24h)
 head(qPCR_data)
@@ -53,7 +59,7 @@ The columns are:
 - `ratio0`: initial ratio, indicating the name of cultures. "none", "less", "equal", "more", "all" represent the *P. putida* monoculture, 1:1000 (EC/PP, same below), 1:1, 1000:1 cocultrues and and *E. coli* monoculture, respectively.
 - `plate`: experiment replicates.
 - `A590`: the absorbtance in 590 nm, as reported by BIOLOG workstation.
-- `A750`: the absorbtance in 750 nm, as reported by BIOLOG workstation, a measurment of carbon usage efficiency in this study.
+- `A750`: the absorbtance in 750 nm, as reported by BIOLOG workstation, a measurment of **carbon usage efficiency (CUE)** in this study.
 - `carbon_id`: the id of carbon sources. From 1-72, in which 1 is the negative control. The following variable `carbon_name` shows the name of each carbon sources.
 - `EC`: the quantity of *E. coli* in coculture
 - `PP`: the quantity of *P. putida* in coculture
@@ -64,7 +70,7 @@ carbon_name <- read_csv("data/carbon.csv")
 head(carbon_name)
 ```
 
-## Normalization
+## Normalization of CUE
 
 `A750` was normalized by substrating the value of negative control in each plate.
 
@@ -73,29 +79,35 @@ qPCR_data <- qPCR_data %>%
    mutate(ratio0 = factor(ratio0, levels = c("less","equal","more")))
 
 # Normalization
-biolog_24h <- biolog_24h %>% 
+biolog_24h <- biolog %>% 
   mutate(ratio0 = factor(ratio0, levels = c("none","less","equal","more","all"))) %>%
   group_by(plate,ratio0) %>% 
-  mutate(A590=A590-A590[carbon_id==1],A750=A750-A750[carbon_id==1]) %>% 
+  mutate(A590=A590-A590[carbon_id==1],A750=A750-A750[carbon_id==1]) %>%   # set negative control to zero
   filter(carbon_id!=1) %>%
   ungroup()
 biolog_mono_24h <- biolog_24h %>% 
   filter(ratio0 %in% c("none","all")) %>% 
   mutate(species=factor(ratio0,levels = c("all","none"),labels = c("E. coli","P. putida"))) %>% 
-  select(-ratio0)
+  dplyr::select(-ratio0)
 biolog_coculture_24h <- biolog_24h %>% 
   filter(ratio0 %in% c("less","equal","more")) %>%
   mutate(ratio0 = factor(ratio0, levels = c("less","equal","more")))
 ```
 
-## Clustering of carbon sources
 
-Carbon sources were clustered by the `A750` in all the cultures.  
+
+## Carbon sources used in this study 
+
+71 different carbon sources were used in this study. We firstly need to group or cluster them into different sub-groups.
+
+### Clustering of carbon sources
+
+Carbon sources were clustered by the `A750` in all the cultures. This is what we called "usage group". Three usage groups were generated using `hclust()` method in R, and were named as U1, U2 and U3.
 
 
 ```{r defining_carbon_usage}
 M_A750_24h <- biolog_24h %>% mutate(sample=paste(ratio0,plate,sep="-")) %>%
-  select(sample,carbon_id,A750) %>%
+  dplyr::select(sample,carbon_id,A750) %>%
   spread(key=sample,value=A750) %>%
   as.data.frame() %>%
   tibble::column_to_rownames(var="carbon_id")
@@ -104,16 +116,21 @@ carbon_group <-  data.frame(usage=k3) %>%
   rownames_to_column(var="carbon_id") %>%
   mutate(carbon_id=as.numeric(carbon_id)) %>%
   mutate(usage=paste("U",usage,sep=""))
+
+carbon_name <- left_join(carbon_name, carbon_group)
+
 ```
 
-## Defining the carbon preference
+
+
+### Defining the carbon preference
 
 Carbon preferences were determined by comparing the `A750` values between *E. coli* and *P.putida* monocultures. 
 
 
 ```{r defining_carbon_prefer}
 biolog_mono_A750_24h <- biolog_mono_24h %>% 
-  select(plate,carbon_id,species,A750) %>% 
+  dplyr::select(plate,carbon_id,species,A750) %>% 
   spread(species,A750) 
 
 PP_prefered <- biolog_mono_A750_24h %>% 
@@ -130,70 +147,195 @@ carbon_prefer <- data.frame("carbon_id"=carbon_name$carbon_id,
                             stringsAsFactors = F)
 carbon_prefer[carbon_prefer$carbon_id %in% EC_prefered$carbon_id,"prefer"] <- "EC"
 carbon_prefer[carbon_prefer$carbon_id %in% PP_prefered$carbon_id,"prefer"] <- "PP"
+
+carbon_name <- left_join(carbon_name, carbon_prefer)
 ```
 
-# Figure 1. The model {#model}
+In *E. coli* preferred carbon sources, the CUE of *E. coli* is statistically greater than that of *P. putida*, while in *P. putida* preferred carbon sources, the CUE of *P. putida* is statistically greater than that of *E. coli*.
 
 
 
-```{r definition_of_social_type,fig.width=6,fig.asp=1, echo=F}
-
-p1 <- ggplot(data.frame(x=c("A","B"),y=c(5,3),fill=c("A","B"),label=c("A","B")),aes(x,y,fill=fill)) + 
-  geom_bar(stat = "identity") +
-  geom_text(aes(label=label),color="white", 
-            position = position_stack(vjust=0.5)) +
-  ylim(c(0,6)) +
-  labs(x="",y="phenotype (CUE)") +
-  theme(legend.position = "none",
-        axis.ticks.y = element_blank(),
-        axis.text.y = element_blank())
-
-coculture1 <- data.frame(x=rep(c("measured","calculated"),each=2),
-                        y=c(1,3,5*0.25,3*0.75),
-                        fill=rep(c("A","B"),times=2),
-                        label=c("A%","B%","A*A%","B*B%"),
-                        alpha=rep(c(1,0.5),each=2),
-                        color=rep(c("white","black"),each=2))
-coculture2 <- data.frame(x=rep(c("measured","calculated"),each=2),
-                        y=c(3,1,5*0.75,3*0.25),
-                        fill=rep(c("A","B"),times=2),
-                        label=c("A%","B%","A*A%","B*B%"),
-                        alpha=rep(c(1,0.5),each=2),
-                        color=rep(c("white","black"),each=2))
-
-plots <- lapply(list(coculture1,coculture2),function(x){
-  x$x <- factor(x$x, levels = c("measured","calculated"))
-  ggplot(x,aes(x,y,fill=fill,alpha=I(alpha))) +
-    geom_bar(stat="identity") +
-    geom_text(aes(label=label,color=I(color)), 
-              position = position_stack(vjust=0.5)) +
-    ylim(c(0,6)) +
-    labs(x="",y="") +
-    theme(legend.position = "none",
-          axis.ticks.y = element_blank(),
-          axis.text.y = element_blank())
+```{r fig-carbon-prefer, fig.cap="Carbon preferences. x-axis is the name of carbon sources and y-axis is the CUE of monocultures."}
+plots <- lapply(c("EC","PP"),function(x){
+  d <- biolog_mono_24h %>% 
+    left_join(carbon_name) %>%
+    filter(prefer == x)
+  ggplot(d,aes(carbon_source,A750,fill=species)) + 
+    geom_boxplot() +
+    labs(y="CUE",x="") +
+    # coord_flip() +
+    theme(legend.position = c(0.5,0.8),
+          legend.direction = "horizontal",
+          legend.text = element_text(face = "italic"),
+          legend.title = element_blank(),
+          axis.text.x = element_text(angle = 60, hjust = 1,vjust = 1))
+    
+    
   
 })
 
-
-plot_grid(p1,
-          plot_grid(plotlist = plots,ncol = 2,labels = c("B","C")),
-          labels = c("A",""),
-          ncol=2,rel_widths = c(1,2))
-
-ggsave("figure 1.tiff",path="figures")
+plot_grid(plots[[1]] + ylim(NA,0.3),
+          plots[[2]],
+          labels = "AUTO",rel_widths  = c(1.5,3),ncol = 2,align = "h")
 ```
 
-# Table 1 The list of 71 carbon sources used in this study {#table1}
 
+### Summary of carbon sources {#table1}
 
+Table 1 listed all the 71 carbon sources used in this study.
 
 ```{r table1}
 library(kableExtra)
-left_join(carbon_name,carbon_group) %>% 
+carbon_name %>% 
   left_join(carbon_prefer) %>% 
-  kable()
+  kable(caption = "The list of 71 carbon sources used in this study") %>%
+  kable_styling("striped", position = "left")
 ```
+
+
+## Defining social interactions {#fig1}
+
+
+The social interaction model was shown in [Figure 1](#fig1).
+
+
+*We reproduced Figure 1 by hand drawing in revision.*
+
+```{r fig1, fig.cap="Figure 1"}
+knitr::include_graphics("figures/Figure-definition_of_social_type-1.png")
+```
+
+## Data transformation
+
+```{r}
+ratio1 <- qPCR_data %>% filter(ratio0 %in% c("less","equal","more")) %>%
+  complete(ratio0,carbon_id,plate) %>% 
+  group_by(ratio0,carbon_id) %>% 
+  dplyr::select(ratio0,plate,carbon_id,ratio1) %>% 
+  mutate(ratio1_mean=mean(ratio1,na.rm = T)) %>% 
+  mutate(ratio1=ifelse(is.na(ratio1),ratio1_mean,ratio1)) %>% 
+  dplyr::select(-ratio1_mean)
+
+mono_A750 <- biolog_mono_24h %>% 
+  group_by(carbon_id,species) %>% 
+  summarise(A750=mean(A750)) %>% 
+  spread(key="species",value="A750") 
+
+A750_caculated <- left_join(ratio1,mono_A750) %>% mutate(A750_cac=(`P. putida`+ratio1*`E. coli`)/(1+ratio1))
+
+social <- biolog_coculture_24h %>% dplyr::select(plate,carbon_id,ratio0,A750) %>%
+  left_join(A750_caculated) %>%
+  group_by(carbon_id,ratio0) %>% 
+  mutate(p_pos=t.test(x=A750,y=A750_cac,alternative = "greater")$p.value,
+            p_neg=t.test(x=A750,y=A750_cac,alternative = "less")$p.value) %>%
+  mutate(social_type=ifelse(
+    p_pos<0.05,"+",
+    ifelse(p_neg<0.05,"-","unresolved"))
+    ) %>% 
+  # mutate(social_type=ifelse(social_type=="+" & (mean(A750)>max(mean(`E. coli`),mean(`P. putida`))),"++",social_type)) %>%
+  # mutate(social_type=ifelse(social_type=="-" & (mean(A750)<min(mean(`E. coli`),mean(`P. putida`))),"--",social_type)) %>%
+  ungroup() %>%
+  dplyr::select(carbon_id,ratio0,social_type,p_pos,p_neg) %>%
+  unique() %>%
+  mutate(ratio0=factor(ratio0,levels = c("less","equal","more")))
+
+table(social$social_type)
+```
+
+## Merge data
+
+```{r}
+merged <- left_join(biolog_coculture_24h,qPCR_data) %>% 
+  left_join(social) %>% 
+  left_join(carbon_name) %>%
+  filter(!is.na(ratio1))
+
+```
+
+### Normalization of data
+
+We firstly explored the normality of observed data in merged data. Accroding to the skewness of data value, we transformed the original data with selected methods. After normalization, all key variables fit the normal distributions [see Figure](#data-normalization).
+
+
+```{r data-normalization, fig.width=10,message=FALSE}
+merged <- merged %>% filter(ratio0 %in% c("less","equal","more"))
+
+par(mfrow=c(3,4))
+
+
+hist(merged$A750)
+qqnorm(merged$A750)
+hist(sqrt(merged$A750))
+qqnorm(sqrt(merged$A750))
+
+hist(merged$EC)
+qqnorm(merged$EC)
+hist(log10(merged$EC))
+qqnorm(log10(merged$EC))
+
+hist(merged$PP)
+qqnorm(merged$PP)
+hist(log10(merged$PP))
+qqnorm(log10(merged$PP))
+
+
+
+
+```
+
+Furthermore, the reference of group variables were optimized.  The initial ratio base level was set to "equal", i.e. 1:1 of *E. coli* and *P. putida*. 
+
+```{r}
+merged$ratio0 <- relevel(merged$ratio0,"equal")
+
+merged$social_type <- as_factor(merged$social_type)
+merged$social_type <- relevel(merged$social_type,"unresolved")
+
+merged$usage <- as_factor(merged$usage)
+merged$usage <- relevel(merged$usage, "U1")
+
+merged$prefer <- as_factor(merged$prefer)
+merged$prefer <- relevel(merged$prefer,"none")
+
+```
+
+Besides, we applied log transformation to the quantity of *E. coli* (EC) and *P. putida* (PP), and sqrt root transformation to A750 values.
+
+```{r}
+data <- merged[,c("ratio0","usage","prefer","A750","EC","PP","social_type")] %>%
+  mutate_at(c("EC","PP"),log10) %>%
+  mutate_at(c("A750"),sqrt)
+```
+
+
+### Exploration of data
+
+
+We used multiple linear regression to explore the correlations between different variables. 
+
+First of all, the carbon usage efficiency (CUE, i.e. A750) was regressed with initial ratio, carbon usage group, carbon preference, the quantity of *E. coili* and *P. putida*.
+
+```{r}
+model <- lm(A750~., data = data)
+summary(model)
+```
+
+```{r}
+model <- lm(PP~., data = data)
+summary(model)
+```
+
+
+```{r}
+model <- lm(EC~., data = data)
+summary(model)
+```
+
+
+
+
+
+
 
 # Figure 2 Final ratios of cocultures {#fig2}
 
@@ -243,6 +385,8 @@ plots <- lapply(list(p1,p2),function(x){
 
 plot_grid(plotlist = plots,ncol=1,labels="AUTO")
 ggsave("figure 2.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
+
 ```
 
 ## Figure 2C
@@ -276,6 +420,8 @@ pushViewport(vp)
 p1
 print(p2,vp=vp)
 ggsave("figure 2C.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
+
 ```
 
 # Figure S2. Final ratios of all cultures
@@ -297,6 +443,8 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
       strip.background = element_blank(),  # remove facet label - "strip"
       strip.text = element_blank())
 ggsave("figure S2.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
+
 ```
 
 
@@ -306,27 +454,30 @@ ggsave("figure S2.tiff",path="figures")
 Figure 3 carbon preferences. (A) definition of E. coli  preferred (EC) and P. putida preferred (PP) carbon sources. x-axis is the CUE and y-axis is the id of carbon sources. (B) comparison of the final ratios of a coculture in different type of carbon sources defined by preference. left: the “less” coculture; middle, the “equal” coculture; right: the “more” coculture. (C) comparison of the final ratios between three cocultures in a given type of carbon sources. left: in *E. coli* preferred carbon sources (EC); middle: in non-preferred carbon sources (none); right: in *P. putida* preferred carbon sources (PP). The p-values given on the top of bracket in B and C are calculated by pairwise Wilcoxon rank sum test.
 
 ```{r}
-p <- left_join(biolog_mono_24h,carbon_prefer) %>% 
-  filter(prefer!="none") %>%
-  ggplot(aes(factor(carbon_id),A750,color=species)) + 
-  geom_boxplot() + 
-  facet_wrap(~prefer,scales="free_y",ncol=1) +
-  labs(y="CUE",x="carbon id")+
-  coord_flip() +
-  theme(legend.position = c(0.8,0.2),
-        legend.text = element_text(face = "italic"))
+plots <- lapply(c("EC","PP"),function(x){
+  d <- biolog_mono_24h %>% 
+    left_join(carbon_name) %>%
+    filter(prefer == x)
+  ggplot(d,aes(carbon_source,A750,fill=species)) + 
+    geom_boxplot() +
+    labs(y="CUE",x="") +
+    # coord_flip() +
+    theme(legend.position = c(0.5,0.8),
+          legend.direction = "horizontal",
+          legend.text = element_text(face = "italic"),
+          legend.title = element_blank(),
+          axis.text.x = element_text(angle = 60, hjust = 1,vjust = 1))
+    
+    
+  
+})
 
-library(grid)
-library(gtable)
-
-# adjust panel height
-gp <- ggplotGrob(p)
-# gtable_show_layout(gp)
-facet.rows <- gp$layout$t[grepl("panel",gp$layout$name)]
-y.var <- sapply(ggplot_build(p)$layout$panel_scales_x,
-                function(l) length(l$range$range))
-gp$heights[facet.rows] <- gp$heights[facet.rows] * y.var
+plot_grid(plots[[1]] + ylim(NA,0.3),
+          plots[[2]],
+          labels = "AUTO",rel_widths  = c(1.5,3),ncol = 2,align = "h")
 ```
+
+
 
 
 ```{r}
@@ -346,8 +497,8 @@ p2 <- left_join(qPCR_data,carbon_prefer) %>% ggplot(aes(x=ratio0,y=ratio1)) +
 ```
 
 
-```{r,fig.asp=1.1,fig.width=8}
-plot_grid(gp,plot_grid(p1,p2,labels = c("B","C"),ncol = 2),labels = c("A",""),ncol = 1,rel_heights = c(1.5,1))
+```{r,fig.width=8}
+plot_grid(p1,p2,labels = "AUTO",ncol = 2)
 ggsave("figure 3.tiff",path="figures")
 ```
 
@@ -553,10 +704,10 @@ Figure 6. Effect of mixing in cocultures. (A) overall comparison for all carbon 
 ratio1 <- qPCR_data %>% filter(ratio0 %in% c("less","equal","more")) %>%
   complete(ratio0,carbon_id,plate) %>% 
   group_by(ratio0,carbon_id) %>% 
-  select(ratio0,plate,carbon_id,ratio1) %>% 
+  dplyr::select(ratio0,plate,carbon_id,ratio1) %>% 
   mutate(ratio1_mean=mean(ratio1,na.rm = T)) %>% 
   mutate(ratio1=ifelse(is.na(ratio1),ratio1_mean,ratio1)) %>% 
-  select(-ratio1_mean)
+  dplyr::select(-ratio1_mean)
 
 mono_A750 <- biolog_mono_24h %>% 
   group_by(carbon_id,species) %>% 
@@ -565,7 +716,7 @@ mono_A750 <- biolog_mono_24h %>%
 
 A750_caculated <- left_join(ratio1,mono_A750) %>% mutate(A750_cac=(`P. putida`+ratio1*`E. coli`)/(1+ratio1))
 
-social <- biolog_coculture_24h %>% select(plate,carbon_id,ratio0,A750) %>%
+social <- biolog_coculture_24h %>% dplyr::select(plate,carbon_id,ratio0,A750) %>%
   left_join(A750_caculated) %>%
   group_by(carbon_id,ratio0) %>% 
   summarise(p_pos=t.test(x=A750,y=A750_cac,alternative = "greater")$p.value,
