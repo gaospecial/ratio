@@ -50,7 +50,7 @@ Raw data were stored in the `data` folder. It mainly comes from two experiments:
 ```{r}
 biolog <- read_csv("data/biolog.csv")
 qPCR_data <- read_csv(file="data/qPCR.csv")
-head(biolog_24h)
+head(biolog)
 head(qPCR_data)
 ```
 
@@ -315,25 +315,31 @@ We used multiple linear regression to explore the correlations between different
 
 First of all, the carbon usage efficiency (CUE, i.e. A750) was regressed with initial ratio, carbon usage group, carbon preference, the quantity of *E. coili* and *P. putida*.
 
+According to the result of multiple linear regression, the factors which significantly influence CUE (A750) are, from strong to weak, the quantity of *P. putida*, carbon usage group (as compared with U1 carbon sources), interaction type (social_type, as compared with unresolved interaction mode), carbon preference (as compared with non-preferred carbon sources), and initial ratio (ratio0, as compared with the 1:1 coculture). The quantity of *E. coli* has no significant influence to CUE. Besides, when the other parameters were controlled, increasing the initial ratio from 1:1 to 1000:1 don’t significantly change CUE. Compared to unresolved interaction mode, a positive interaction mode is positively correlated with CUE, while a negative interaction mode is negatively correlated with CUE. Summary of the linear model was showed as follows. 
+
 ```{r}
 model <- lm(A750~., data = data)
 summary(model)
+# car::vif(model)
 ```
+
+Likewise, the relationship between the population of *E. coli* (or *P. putida*) and other variables was also investigated. 
+
+As shown below, we found the populations of *P. putida* in cocultures were significantly associated with the 1000:1 initial ratio, carbon usage group U2 and U3, *E. coli* preferred carbon sources, and the CUE (A750). Interestingly, more *E. coli* in initial inoculate (more, 1000:1) is helpful to increase the final population of *P. putida* compared the 1:1 initial ratio when other parameters were controlled.
+
+
 
 ```{r}
 model <- lm(PP~., data = data)
 summary(model)
 ```
 
+In addition, we found that the population of *E. coli* was negatively correlated with less initial ratio (ratio0less), and a negative interaction mode (social_type-), while positively correlated with carbon usage group U2 (usageU2), preferred carbon sources (preferEC), and a positive interaction mode (social_type+). However, the population of *E. coli* was not significantly correlated with CUE. These results indicated that the E. coli population increment may not enhance CUE directly but help on increasing the CUE of *P. putida* in cocultures. Therefore, the interaction mode is significantly associated with *E. coli* population but not *P. putida* population.
 
 ```{r}
 model <- lm(EC~., data = data)
 summary(model)
 ```
-
-
-
-
 
 
 
