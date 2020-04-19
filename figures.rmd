@@ -201,9 +201,17 @@ The social interaction model was shown in [Figure 1](#fig1).
 
 *We reproduced Figure 1 by hand drawing in revision.*
 
-```{r fig1, fig.cap="Figure 1"}
+```{r include=FALSE}
+fig_cap_interaction_model <- "Figure 1. The interaction model used in this study. (A) The phenotype (CUE) of strain A and strain B in monoculture are CUE_A_ and CUEB, respectively. The CUE of two strains in coculture is assumed not equal, and CUEA is higher than CUEB. (B) When strain A and B were co-cultivated, coculture CUE may fail into three aspects. Firstly, if CUE > CUEA, it was interpreted as positive interaction mode (induction) because of the coculture increased total capacity comparing with the best of monoculture. By contrast, if CUE < CUEB, it was interpreted as negative interaction mode (reduction). Besides, if CUE is between CUEA and CUEB, an additional hypothesis test method was applied to reveal interaction mode as described in Methods (C and D). (C) shows an example of positive interaction. The measured coculture CUE has a normal distribution with the mean of μ1, and the relative abundance of strain A and strain B are A% and B%, respectively. Using the monoculture CUEA and CUEB, and their relative abundance, we can get the calculated CUE, which also has a normal distribution with the mean of μ2. If μ1 is significantly greater than μ2, we defined the coculture with a positive mode of interaction. (D) shows an example of negative interaction. Although the measured coculture CUE is equal to that in (C), we get a negative interaction mode as they have different relative abundance of strain A and B. "
+```
+
+
+
+```{r fig1, fig.cap=fig_cap_interaction_model,include=FALSE}
 knitr::include_graphics("figures/Figure-definition_of_social_type-1.png")
 ```
+
+
 
 ## Data transformation
 
@@ -359,7 +367,12 @@ aov_p <- compare_means(ratio1~ratio0,
 
 ## Figure 2A, B
 
-```{r fig.asp=0.8,fig.width=6}
+```{r include=FALSE}
+fig_cap_ratio1_in_selected_carbon <- "Final ratios of cocultures. Examples for significant results (A) or non-significant results (B) of final ratios. The strip label of each subplot (top) indicates carbon source."
+```
+
+
+```{r fig.asp=0.8,fig.width=6,fig.cap=fig_cap_ratio1_in_selected_carbon}
 
 carbon_name_labeller <- function(x){
   name_of <- carbon_name$carbon_source
