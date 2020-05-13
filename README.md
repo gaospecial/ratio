@@ -5,4 +5,5 @@ Dissecting the impact of initial inoculation ratio on the structure, function an
 In submission.
 
 The codes available here enable reproducible study of the current manuscript. 
-They are provided in both [English](./figures.md) and [Chinese](./figures-zh.md) version.
+
+Please check [figures.rmd](./figures.rmd) and [figures.html](./figures.html) for more information.
