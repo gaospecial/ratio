@@ -6,4 +6,4 @@ In submission.
 
 The codes available here enable reproducible study of the current manuscript. 
 
-Please check [figures.rmd](./figures.rmd) and [figures.html](./figures.html) for more information.
+Please check [figures.rmd](./figures.rmd) and [figures.html](./figures.html) for more information ([preview figures.html](https://htmlpreview.github.io/?https://github.com/gaospecial/ratio/blob/master/figures.html)).
