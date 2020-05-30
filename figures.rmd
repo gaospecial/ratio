@@ -250,7 +250,7 @@ table(social$social_type) %>% barplot(col=c("blue","red","grey"))
 
 Finally, we get 87 negative, 46 positive and 80 unresolved interaction modes.
 
-Social interaction defined based on the absolute density of single and co-cultivation of two species. 
+Social interaction defined based on the absolute density of monoculture and co-culture of two species. 
 
 ```{r fig.width=6}
 
@@ -919,7 +919,7 @@ export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
-## Figure  Social interaction defined based on the absolute density of single and co-cultivation of two species.
+## Figure  Social interaction defined based on the absolute density of monoculture and  co-culture of two species.
 
 ```{r}
 
