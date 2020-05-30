@@ -36,6 +36,7 @@ library(ggpubr)
 library(pheatmap)
 library(RColorBrewer)
 library(vegan)
+library(reshape2)
 
 theme_set(theme_bw())
 ```
@@ -51,8 +52,10 @@ Raw data were stored in the `data` folder. It mainly comes from two experiments:
 ```{r}
 biolog <- read_csv("data/biolog.csv")
 qPCR_data <- read_csv(file="data/qPCR.csv")
+mono_data <- read_csv("data/mono.csv")
 head(biolog)
 head(qPCR_data)
+head(mono_data)
 ```
 
 The columns are:
@@ -80,6 +83,18 @@ knitr::include_graphics("figures/Figure-S1-primer-specificity.png")
 
 
 ## Raw data
+
+qpcr quantification
+
+```{r}
+mono_data <- mono_data  %>% melt(id.vars=c("plate","carbon_id"),variable.name ="Target.Name",value.name="Quantity_mono")
+
+cocu_data <-qPCR_data %>% select(plate,carbon_id,ratio0,EC,PP) %>% melt(id.vars=c("plate","carbon_id","ratio0"),variable.name ="Target.Name",value.name="Quantity_cocu")
+
+data_all <- merge(mono_data, cocu_data, by = c("carbon_id","Target.Name","plate"),all=T) %>% filter(carbon_id!="1")
+
+```
+
 
 `A750` was normalized by substrating the value of negative control in each plate.
 
@@ -235,6 +250,25 @@ table(social$social_type) %>% barplot(col=c("blue","red","grey"))
 
 Finally, we get 87 negative, 46 positive and 80 unresolved interaction modes.
 
+Social interaction defined based on the absolute density of single and co-cultivation of two species. 
+
+```{r fig.width=6}
+
+social_qpcr <- data_all %>% 
+  group_by(carbon_id,Target.Name,ratio0) %>% 
+  summarise(p_pos=t.test(x=log10(Quantity_cocu),y=log10(Quantity_mono),alternative = "greater")$p.value,
+            p_neg=t.test(x=log10(Quantity_cocu),y=log10(Quantity_mono),alternative = "less")$p.value)%>%
+  mutate(social_type=ifelse(
+    p_pos<0.05,"+",
+    ifelse(p_neg<0.05,"-","unresolved"))
+    ) %>% ungroup() %>%
+  mutate(ratio0=factor(ratio0,levels = c("less","equal","more")))
+
+table(social_qpcr$social_type) %>% barplot(col=c("blue","red","grey"))
+
+```
+
+
 ## Exploration of data
 
 We now have multiple parameters, including the initial ratio (`ratio0`) and the final ratio (`ratio1`), the populations of *E. coli* and *P. putida* in cocultures (`EC` and `PP`), the CUE (`A750`), the preference of carbon sources to *E. coli* and *P. putida*, and the social interaction mode (`social_type`) calculated as described in [Figure 1](#fig1).
@@ -246,6 +280,19 @@ merged <- left_join(biolog_coculture_24h,qPCR_data) %>%
   left_join(social) %>% 
   left_join(carbon_name) %>%
   filter(!is.na(ratio1))
+
+```
+
+Total data containing social behavior based on absolute density definition
+
+```{r}
+
+social_qpcr <-social_qpcr %>% select(social_type,carbon_id,ratio0)
+  
+merged_qpcr <- qPCR_data %>% 
+  left_join(social_qpcr) %>% 
+  left_join(carbon_name) %>%
+  filter(!is.na(ratio1)) %>% mutate(social_type=factor(social_type,levels = c('unresolved','+','-'))) %>% mutate(prefer=factor(prefer,levels = c('none','EC','PP')))
 
 ```
 
@@ -872,6 +919,68 @@ export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
+## Figure  Social interaction defined based on the absolute density of single and co-cultivation of two species.
+
+```{r}
+
+plots_proportion <- lapply(list(c("ratio0","social_type"),c("ratio0","usage","social_type"),c("ratio0","prefer","social_type")), function(x){
+  df <- merged_qpcr %>%
+    group_by(.dots=x) %>%
+    summarise(count=n()) %>%
+    mutate(proportion=count/sum(count)) %>%
+    mutate(label=paste(round(proportion*100),"%",sep=""))
+  ggplot(df,aes_string("ratio0","proportion",fill="social_type")) +
+    geom_col() +
+    geom_text(aes(label=label),color="white",
+              position = position_stack(vjust=0.5),
+              size=3) +
+    scale_fill_manual(values = c("+"="firebrick","-"="royalblue","unresolved"="grey"),
+                     labels = c("unresolved", "positive", "negative"),
+                     name="interaction mode") +
+   theme(legend.position = "none",
+          legend.title = element_text(face="bold")) +  
+    scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
+  theme(axis.text.x = element_text(angle = 60,hjust = 1,vjust = 1)  ) +
+    xlab("") 
+})
+
+legend <- get_legend(plots_proportion[[1]] + theme(legend.position = "right"))
+
+```
+
+```{r }
+plots_population <- lapply(c("EC","PP"),function(x){
+  ggplot(merged_qpcr,aes_string("social_type",x)) + geom_boxplot() +
+    stat_compare_means(method = "wilcox.test",comparisons = list(c("unresolved","+"),c("-","+")),size=3)+
+    theme(axis.text.x = element_text(angle = 60,hjust = 1,vjust = 1)  ) +
+    scale_x_discrete(labels = c("unresolved","positive","negative"),
+                     breaks = c("unresolved","+","-")) +
+    labs(x="")
+})
+
+
+```
+
+```{r fig.width=8,fig.asp=1}
+plot_grid(plot_grid(plots_proportion[[1]],
+                    plots_proportion[[2]]+ facet_wrap(~usage ),
+                    legend, 
+                    rel_widths = c(1.8,4,1.5),
+                    ncol = 3,
+                    labels = c("A","B","")),
+          plot_grid(plots_proportion[[3]] + facet_wrap(~prefer, 
+                                                       labeller = labeller(prefer = prefer_labeller)) + 
+                      theme(strip.text = element_text(face = "italic")),
+                    plots_population[[1]] + labs(y="quantity of E. coli"),
+                    plots_population[[2]] + labs(y="quantity of P. putida"),
+                    labels = c("C","D","E"),
+                    ncol = 3,
+                    rel_widths = c(5,2,2)),
+          ncol = 1)
+# ggsave("figure 5-1.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
+
+```
 
 ## Figure S5 The interaction mode of all combinations
 
