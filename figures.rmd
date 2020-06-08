@@ -37,6 +37,7 @@ library(pheatmap)
 library(RColorBrewer)
 library(vegan)
 library(reshape2)
+library(magrittr)
 
 theme_set(theme_bw())
 ```
@@ -496,7 +497,7 @@ pushViewport(vp)
 print(p1)
 print(p2,vp=vp)
 # ggsave("figure 2A.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
@@ -548,7 +549,7 @@ plots <- lapply(list(p1,p2),function(x){
 
 plot_grid(plotlist = plots,ncol=1,labels=c("B","C"))
 # ggsave("figure 2.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
@@ -659,7 +660,6 @@ plot_grid(plot_grid(plots[[1]] + ylim(NA,0.3),
           ncol = 1,
           rel_heights = c(5,4))
 # ggsave("figure 3.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -698,7 +698,7 @@ add_ellipase <- function(p, x="PC1", y="PC2", group="group",
                          linetype="dashed",
                          colour = "black",
                          lwd = 1,...){
-  obs <- p$data[,c(x, y, group)]
+  obs <- p$data[,c(x,y,group)]
   colnames(obs) <- c("x", "y", "group")
   ellipse_pro <- ellipase_pro
   theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, length = 50))
@@ -755,7 +755,7 @@ p_pca <- add_ellipase(p,alpha=0.1,show.legend = F,lwd=1)
 ```{r fig.width=8,fig.cap="Figure S3. The carbon usage profiles of two monocultures (*E.coli* and *P. putida*) and three cocultures (1:1000, 1:1, and 1000:1).  (A) boxplot. Number shows the median of each culture, and horizontal line shows the mean of all cultures. (B) PCA analysis of carbon usage profiles. Ellipses represent the 95% confidence interval of clustering."}
 plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B"),rel_widths = c(7,10))
 # ggsave("figure 4.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
@@ -824,7 +824,7 @@ plot_grid(ggplotify::as.ggplot(p_heatmap),
           u2_p1,
           labels = "AUTO",ncol=1)
 # ggsave("figure 5.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
@@ -915,7 +915,7 @@ plot_grid(plot_grid(plots_proportion[[1]],
                     rel_widths = c(5,2,2)),
           ncol = 1)
 # ggsave("figure 5.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
@@ -978,7 +978,7 @@ plot_grid(plot_grid(plots_proportion[[1]],
                     rel_widths = c(5,2,2)),
           ncol = 1)
 # ggsave("figure 5-1.tiff",path="figures")
-export::graph2ppt(file="figures.pptx",append=TRUE)
+
 
 ```
 
