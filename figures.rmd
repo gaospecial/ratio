@@ -294,6 +294,8 @@ merged_qpcr <- qPCR_data %>%
   left_join(social_qpcr) %>% 
   left_join(carbon_name) %>%
   filter(!is.na(ratio1)) %>% mutate(social_type=factor(social_type,levels = c('unresolved','+','-'))) %>% mutate(prefer=factor(prefer,levels = c('none','EC','PP')))
+merged_qpcr$EC <- log10(merged_qpcr$EC)
+merged_qpcr$PP <- log10(merged_qpcr$PP)
 
 ```
 
