@@ -921,7 +921,7 @@ plot_grid(plot_grid(plots_proportion[[1]],
 
 ```
 
-## Figure  Social interaction defined based on the absolute density of monoculture and  co-culture of two species.
+## Figure 5-1. Social interaction defined based on the absolute density of monoculture and  co-culture of two species.
 
 ```{r}
 
@@ -962,8 +962,9 @@ plots_population <- lapply(c("EC","PP"),function(x){
 
 
 ```
+ 
+```{r fig5-1, fig.asp=1,fig.width=8,fig.cap="Figure 5-1. Social interaction was defined based on the bacteria quantity (defined by traditinal model). The main conclusion is that the social interaction defined by the two methods are comparable.  Consistent with the results of our model, two species co-cultured with “1:1” and “1000:1”  are more likely to use carbon sources synergistically than co-cultivation with “1:1000” (A). In addition, the “1:1000” coculture has the most negative interaction, regardless of the type of carbon sources (A-C).  In tranditional model, “1:1” and “1000:1” cocultures have no negative interaction as well, although the positive interaction proportion is less (B).  However, there is more unresloved interaction defined by traditional approach (A). And we found that the quantity of *E.coli* in positive interaction is not significantly higher thant that in unresolved interaction (D). The results suggested that our method can define the interactionbehavior of species more accurately, while comparing with traditional approache."}
 
-```{r fig.width=8,fig.asp=1}
 plot_grid(plot_grid(plots_proportion[[1]],
                     plots_proportion[[2]]+ facet_wrap(~usage ),
                     legend, 
@@ -980,7 +981,6 @@ plot_grid(plot_grid(plots_proportion[[1]],
                     rel_widths = c(5,2,2)),
           ncol = 1)
 # ggsave("figure 5-1.tiff",path="figures")
-
 
 ```
 
