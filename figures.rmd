@@ -251,7 +251,7 @@ table(social$social_type) %>% barplot(col=c("blue","red","grey"))
 ```
 
 
-Finally, we get 70 negative, 59 positive and 80 unresolved interaction modes.
+Finally, we get 70 negative, 59 positive and 84 unresolved interaction modes.
 
 Social interaction defined based on the absolute density of monoculture and co-culture of two species. 
 
@@ -766,7 +766,7 @@ p_pca <- add_ellipase(p,alpha=0.1,show.legend = F,lwd=1)
 
 
 
-```{r fig.width=8,fig.cap="Figure S3. The carbon usage profiles of two monocultures (*E.coli* and *P. putida*) and three cocultures (1:1000, 1:1, and 1000:1).  (A) boxplot. Number shows the median of each culture, and horizontal line shows the mean of all cultures. (B) PCA analysis of carbon usage profiles. Ellipses represent the 88% confidence interval of clustering."}
+```{r fig.width=8,fig.cap="Figure S3. The carbon usage profiles of two monocultures (*E.coli* and *P. putida*) and three cocultures (1:1000, 1:1, and 1000:1).  (A) boxplot. Number shows the median of each culture, and horizontal line shows the mean of all cultures. (B) PCA analysis of carbon usage profiles. Ellipses represent the 95% confidence interval of clustering."}
 plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B"),rel_widths = c(7,10))
  ggsave("figure 4.tiff",path="figures")
 
@@ -1130,22 +1130,6 @@ ggplot(biolog, aes(A590,A750,color=ratio0)) +
   facet_wrap(~ratio0) +
   geom_smooth(method = "lm",size=1,show.legend = F) + 
   stat_smooth_func(geom = "text",method = "lm",parse=T, hjust=0,xpos = 0.25,ypos = 1.4, show.legend = F)
-
-```
-
-## Final number
-
-```{r fig.asp=0.6,fig.width=10,fig.cap="Figure S9. The final number of bacteria in the co-culture systems after 24 hours."}
-
-qPCR_data$ratio0 <- factor(qPCR_data$ratio0,
-                        levels = c("less","equal","more"),
-                        labels = c("1:1000","1:1","1000:1")) 
-qPCR_data$quantity <- qPCR_data$EC +qPCR_data$PP
-qPCR <- tidyr::unite(qPCR_data, "ratio0_plate", ratio0, plate)
-ggplot(qPCR,aes(ratio0_plate,quantity),color=ratio0_plate) + 
-  geom_violin(aes(fill=factor(ratio0_plate)))+
-  geom_boxplot(width=0.1,position=position_dodge(0.8))+ #绘制箱线图
-  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))+theme(legend.position="none")
 
 ```
 
