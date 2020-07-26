@@ -1,6 +1,5 @@
 ---
-title: Initial inoculation ratio and niche condition cooperatively regulate the community
-  structure and metabolic capacity of co-culture system
+title: The initial inoculation ratio regulates bacterial coculture interactions and metabolic capacity
 author: "gaospecial@gmail.com"
 date: "2020-5-15"
 output:
