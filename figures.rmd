@@ -1,16 +1,20 @@
 ---
-title: "Initial inoculation ratio and niche condition cooperatively regulate the community structure and metabolic capacity of co-culture system"
+title: Initial inoculation ratio and niche condition cooperatively regulate the community
+  structure and metabolic capacity of co-culture system
 author: "gaospecial@gmail.com"
 date: "2020-5-15"
 output:
   html_document:
-    toc: true
+    toc: yes
     toc_depth: 3
-    toc_float: 
-      collapsed: false
-      smooth_scroll: false
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
   md_document:
     variant: markdown_github
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
@@ -169,7 +173,7 @@ EC_prefered <- biolog_mono_A590_24h %>%
   filter(p<0.05)
 
 carbon_prefer <- data.frame("carbon_id"=carbon_name$carbon_id,
-                            "prefer"="none",
+                            "prefer"="None",
                             stringsAsFactors = F)
 carbon_prefer[carbon_prefer$carbon_id %in% EC_prefered$carbon_id,"prefer"] <- "EC"
 carbon_prefer[carbon_prefer$carbon_id %in% PP_prefered$carbon_id,"prefer"] <- "PP"
@@ -201,7 +205,7 @@ The social interaction model was shown in [Figure 1](#fig1).
 
 
 ```{r include=FALSE}
-fig_cap_interaction_model <- "Figure 1. The interaction model used in this study. (A) The phenotype (CUE) of strain A and strain B in monoculture are CUE_A_ and CUEB, respectively. The CUE of two strains in coculture is assumed not equal, and CUEA is higher than CUEB. (B) When strain A and B were co-cultivated, coculture CUE may fail into three aspects. Firstly, if CUE > CUEA, it was interpreted as positive interaction mode (induction) because of the coculture increased total capacity comparing with the best of monoculture. By contrast, if CUE < CUEB, it was interpreted as negative interaction mode (reduction). Besides, if CUE is between CUEA and CUEB, an additional hypothesis test method was applied to reveal interaction mode as described in Methods (C and D). (C) shows an example of positive interaction. The measured coculture CUE has a normal distribution with the mean of μ1, and the relative abundance of strain A and strain B are A% and B%, respectively. Using the monoculture CUEA and CUEB, and their relative abundance, we can get the calculated CUE, which also has a normal distribution with the mean of μ2. If μ1 is significantly greater than μ2, we defined the coculture with a positive mode of interaction. (D) shows an example of negative interaction. Although the measured coculture CUE is equal to that in (C), we get a negative interaction mode as they have different relative abundance of strain A and B. "
+fig_cap_interaction_model <- "Figure 1. The interaction model used in this study. (A) The phenotype (CUE) of strain A and strain B in monoculture are CUE_A_ and CUEB, respectively. The CUE of two strains in coculture is assumed not equal, and CUEA is higher than CUEB. (B) When strains A and B were cocultivated,the coculture CUE could generally fail into three aspects. Firstly, if CUE > CUEA, it was interpreted as positive interaction mode (induction) because of the coculture increased total capacity comparing with the best of monoculture. By contrast, if CUE < CUEB, it was interpreted as negative interaction mode (reduction). Besides, if CUE was between CUEA and CUEB, an additional hypothesis test method was applied to reveal interaction mode as described in Methods (C and D). (C) shows an example of positive interaction. The measured coculture CUE has a normal distribution with the mean of μ1, and the relative abundance of strain A and strain B are A% and B%, respectively. Using the monoculture CUEA and CUEB, and their relative abundance, we can get the calculated CUE, which also has a normal distribution with the mean of μ2. If μ1 is significantly greater than μ2, we defined the coculture with a positive mode of interaction. (D) shows an example of negative interaction. Although the measured coculture CUE is equal to that in (C), we get a negative interaction mode as they have different relative abundance of strains A and B. "
 ```
 
 
@@ -339,7 +343,7 @@ merged <- merged  %>%
 ```
 
 
-Furthermore, the reference of group variables were optimized. For example, the initial ratio base level was set to "`equal`", i.e. `1:1` of *E. coli* and *P. putida*. The base level for `social_type` is "`unresolved`", the base level of `usage` is "`U1`", and the base level of `prefer` is "`none`".
+Furthermore, the reference of group variables were optimized. For example, the initial ratio base level was set to "`equal`", i.e. `1:1` of *E. coli* and *P. putida*. The base level for `social_type` is "`unresolved`", the base level of `usage` is "`U1`", and the base level of `prefer` is "`None`".
 
 ```{r}
 merged$ratio0 <- relevel(merged$ratio0,"equal")
@@ -351,7 +355,7 @@ merged$usage <- as_factor(merged$usage)
 merged$usage <- relevel(merged$usage, "U1")
 
 merged$prefer <- as_factor(merged$prefer)
-merged$prefer <- relevel(merged$prefer,"none")
+merged$prefer <- relevel(merged$prefer,"None")
 
 ```
 
@@ -478,15 +482,16 @@ p1 <- ggplot(aov_p,aes(p.adj)) +
   geom_line(stat = "density",lwd=1) +
   geom_density(lwd=0,color=NA,fill="lightblue") +
   geom_vline(xintercept = p.cutoff,lwd=1,lty="dashed",color="firebrick") +
+  labs(x="P.adj",y="Density")+
   geom_text(x=0.06,y=0,label=p.cutoff,
             vjust="top",
             hjust="left",
             color="firebrick")
 
 p2 <- ggplot(aov_p, aes(p.adj.signif,fill=prefer)) + geom_bar() +
-  labs(x="significance of p.adj",y="frequency") + 
+  labs(x="Significance of p.adj",y="Frequency") + 
   # geom_text(aes(label=Freq),vjust=0,nudge_y = 1) +
-  scale_fill_discrete(breaks=c("none","EC","PP"),labels=c("none","E. coli","P. putida"),name="Preference") +
+  scale_fill_discrete(breaks=c("None","EC","PP"),labels=c("None","E. coli","P. putida"),name="Preference") +
   theme(legend.text = element_text(face="italic"),
         legend.position = c(0.65,0.7))
 
@@ -497,11 +502,11 @@ pushViewport(vp)
 ```
 
 
-```{r fig.width=7,fig.asp=0.618,fig.cap="Figure 2A. The density of adjusted p-value (ANOVA) in testing whether final ratios of three coculture are different in all carbon sources. X-axis represents the adjusted p-value, and vertical line indicates the position of p-value cutoff (0.05). inset: barplot shows the frequency of significance of adjusted p-value (**, p<0.01, *, p<0.05, ns, p≥0.05). In the barplot, frequencies were colored by carbon preference."}
+```{r fig.width=7,fig.asp=0.618,fig.cap="Figure 2A. The density of the adjusted p-value (ANOVA) in testing whether the final ratios of three coculture are different in all carbon sources.The X-axis represents the adjusted p-value, and the vertical line indicates the position of the p-value cutoff (0.05). Inset: barplot shows the frequency of significance of adjusted p-value (**, p<0.01, *, p<0.05, ns, p≥0.05). In the barplot, frequencies were colored by carbon preference."}
 print(p1)
 print(p2,vp=vp)
-# ggsave("figure 2A.tiff",path="figures")
-
+ggsave("figure 2A.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -510,7 +515,7 @@ print(p2,vp=vp)
 ## Figure 2B, C: examples of significant/non-significant results {#fig-2B}
 
 ```{r echo=FALSE}
-fig_cap_ratio1_in_selected_carbon <- "Figure 2B,C. Final ratios of cocultures. Examples for significant results (B) or non-significant results (C) of final ratios. The strip label of each subplot (top) indicates carbon source."
+fig_cap_ratio1_in_selected_carbon <- "Figure 2B,C. Final ratios of cocultures. Examples for significant results (B) or nonsignificant results (C) of final ratios. The strip label of each subplot (top) indicates carbon source."
 ```
 
 
@@ -544,16 +549,16 @@ plots <- lapply(list(p1,p2),function(x){
     # stat_compare_means(method="aov") + 
     scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
     theme(axis.text.x = element_text(angle = 60, hjust = 1,vjust = 1)) +
-    scale_color_discrete(breaks=c("none","EC","PP"),labels=c("none","E. coli","P. putida"),name="Preference")+
+    scale_color_discrete(breaks=c("None","EC","PP"),labels=c("None","E. coli","P. putida"),name="Preference")+
     theme(legend.text = element_text(face="italic")) +
-    labs(x="",y="final ratio (EC/PP)")
+    labs(x="",y="Final ratio (EC/PP)")
     
 })
 
 
 plot_grid(plotlist = plots,ncol=1,labels=c("B","C"))
-# ggsave("figure 2.tiff",path="figures")
-
+ggsave("figure 2.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -565,24 +570,24 @@ The whole picture of final ratios.
 
 ```{r fig.asp=1,fig.width=8}
 ggplot(merged %>% left_join(aov_p),aes(ratio0,ratio1,color=prefer)) + geom_boxplot() +
-  geom_text(aes(x="less",y=1,label=paste0(carbon_id,"(p=",p.adj,")")),color="grey",vjust="inward",hjust="inward",size=3,show.legend = F) +
+  geom_text(aes(x="less",y=.75,label=paste0(carbon_id,"(p=",p.adj,")")),color="grey",vjust=1,hjust="inward",size=2.25,show.legend = F) + ylim(NA, 1) + 
   # ggpubr::stat_compare_means(method="aov",label="p.signif") +
   facet_wrap(~carbon_id) +
   # geom_jitter() +
   # geom_text(aes(x="equal", y=0.5,label= p.adj),check_overlap = T, data=aov_p,inherit.aes = FALSE,size=3) +
   # scale_y_log10(breaks=c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10")) +
-  xlab("") + ylab("final ratio (EC/PP)") +
+  xlab("") + ylab("Final ratio (EC/PP)") +
     scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
     theme(axis.text.x = element_text(angle = 60, hjust = 1,vjust = 1)) +
-    scale_color_discrete(breaks=c("none","EC","PP"),labels=c("none","E. coli","P. putida"),name="Preference")+
+    scale_color_discrete(breaks=c("None","EC","PP"),labels=c("None","E. coli","P. putida"),name="Preference")+
     theme(legend.text = element_text(face="italic")) +
   theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
       legend.position = "top",
       legend.direction = "horizontal",
       strip.background = element_blank(),  # remove facet label - "strip"
       strip.text = element_blank())
-# ggsave("figure S2.tiff",path="figures")
-# export::graph2ppt(file="figures.pptx",append=TRUE)
+ggsave("figure S2.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -627,18 +632,18 @@ p1 <- ggplot(merged,aes(x=prefer,y=ratio1)) +
   geom_boxplot() + 
   facet_wrap(~ratio0,
              labeller = labeller(ratio0 = ratio0_labeller)) + 
-  scale_x_discrete(breaks=c("none","EC","PP"),labels=c("none","E. coli","P. putida")) +
+  scale_x_discrete(breaks=c("None","EC","PP"),labels=c("None","E. coli","P. putida")) +
   theme(axis.text.x = element_text(face = "italic",
                                    angle = 60,
                                    hjust = 1,
                                    vjust = 1)) +
-  stat_compare_means(method="wilcox.test",comparisons = list(c("EC","none"),c("none","PP"),c("EC","PP")),size=3) +
-  labs(x="type of carbon perference", y="final ratio (EC/PP)") +
+  stat_compare_means(method="wilcox.test",comparisons = list(c("EC","None"),c("None","PP"),c("EC","PP")),size=3) +
+  labs(x="Type of carbon perference", y="Final ratio (EC/PP)") +
   ylim(c(NA,1.5))
 
 prefer_labeller <- function(x){
-  name_of_prefer <- c("none","E. coli","P. putida")
-  names(name_of_prefer) <- c("none","EC","PP")
+  name_of_prefer <- c("None","E. coli","P. putida")
+  names(name_of_prefer) <- c("None","EC","PP")
   return(as.character(name_of_prefer[x]))
 }
 
@@ -649,7 +654,7 @@ p2 <- ggplot(merged,aes(x=ratio0,y=ratio1)) +
   stat_compare_means(method="wilcox.test",comparisons = list(c("less","equal"),c("equal","more"),c("less","more")),size=3) +
   scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
     theme(axis.text.x = element_text(angle = 60, hjust = 1,vjust = 1)) +
-  labs(x="inital ratio (EC/PP)", y="final ratio (EC/PP)") +
+  labs(x="Inital ratio (EC/PP)", y="Final ratio (EC/PP)") +
   ylim(c(NA,1.5))
 ```
 
@@ -664,7 +669,7 @@ plot_grid(plot_grid(plots[[1]] + ylim(NA,0.7),
           ncol = 1,
           rel_heights = c(5,4))
 ggsave("figure 3.tiff",path="figures")
-
+#export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
 
 
@@ -690,7 +695,7 @@ p_cue <- ggplot(biolog_24h,aes(ratio0,A590)) +
             data = biolog_24h %>% group_by(ratio0) %>% 
               summarise(y=median(A590)),
             vjust=-0.3) +
-  labs(x="initial ratio (EC/PP)",y="CUE")
+  labs(x="Initial ratio (EC/PP)",y="CUE")
 ```
 
 
@@ -747,13 +752,13 @@ p <- ggplot(df, aes(PC1,PC2,label=ratio0,color=ratio0))+
   scale_color_manual(values = brewer.pal(9,"YlOrRd")[5:9],name="Initial Ratio")+
   xlab(paste0("PC1: ", round(percent_var[1] * 100), "% variance")) +
   ylab(paste0("PC2: ", round(percent_var[2] * 100), "% variance")) +
- annotate("text", x = -.125, y = .75, label = "P. putida", 
+ annotate("text", x = -.125, y = .9, label = "P. putida", 
            colour = brewer.pal(9,"YlOrRd")[5], size = 4, fontface = "italic") + 
   annotate("text", x = -.25, y = .25, label = "1:1000", size = 4, 
            colour = brewer.pal(9,"YlOrRd")[6]) + 
-  annotate("text", x = -.8, y = -.87, label = "E. coli", 
+  annotate("text", x = -.8, y = -1, label = "E. coli", 
            colour = brewer.pal(9,"YlOrRd")[9], size = 4, fontface = "italic") + 
-  annotate("text", x = .75, y = -.2, label = "1:1", size = 4,  
+  annotate("text", x = 1, y = -.2, label = "1:1", size = 4,  
            colour = brewer.pal(9,"YlOrRd")[7]) + 
   annotate("text", x = .45, y = -.35, label = "1000:1", size = 4, 
            colour = brewer.pal(9,"YlOrRd")[8]) 
@@ -768,8 +773,8 @@ p_pca <- add_ellipase(p,alpha=0.1,show.legend = F,lwd=1)
 
 ```{r fig.width=8,fig.cap="Figure S3. The carbon usage profiles of two monocultures (*E.coli* and *P. putida*) and three cocultures (1:1000, 1:1, and 1000:1).  (A) boxplot. Number shows the median of each culture, and horizontal line shows the mean of all cultures. (B) PCA analysis of carbon usage profiles. Ellipses represent the 95% confidence interval of clustering."}
 plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B"),rel_widths = c(7,10))
- ggsave("figure 4.tiff",path="figures")
-
+ggsave("figure 4.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -780,7 +785,8 @@ plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B"),rel_widths = c(7,10))
 ```{r}
 anno_carbon_group <- carbon_group %>% 
   left_join(carbon_prefer) %>%
-  column_to_rownames(var="carbon_id")
+  column_to_rownames(var="carbon_id") %>%
+  rename(Usage = usage,Prefer = prefer)
 colnames(M_A590_24h) <- rep(c("E. coli","1:1","1:1000","1000:1","P. putida"),each=3)
 p_heatmap <- pheatmap(t(M_A590_24h),
          annotation_col = anno_carbon_group[c(2,1)],
@@ -821,7 +827,7 @@ u2_p1 <- ggplot(biolog_24h_U2, aes(ratio0,A590)) +
             vjust=0,nudge_y = .2,hjust=0) +
   facet_wrap(~carbon_id,ncol=5,
              labeller = labeller(carbon_id=carbon_name_labeller)) +
-  scale_x_discrete(breaks=c("none","less","equal","more","all"),labels=c("P.putida","1:1000","1:1","1000:1","E.coli")) +
+  scale_x_discrete(breaks=c("none","less","equal","more","all"),labels=c("P. putida","1:1000","1:1","1000:1","E.coli")) +
   scale_y_continuous(breaks = c(0,1,2)) +
   labs(x="",y="CUE") + 
   # ggpubr::stat_compare_means(method="aov",label="p.format") +
@@ -833,13 +839,13 @@ u2_p1 <- ggplot(biolog_24h_U2, aes(ratio0,A590)) +
 
 
 
-```{r fig4, fig.asp=1,fig.width=8,fig.cap="Figure 4. Initial ratio regulates carbon usage profiles of cocultures. (A) Clustering of carbon sources by usage groups. In the heatmap, type of carbon sources was indicated by bars on the top, carbon id is indicated by the number on the bottom, and experiment replicates were given on the right. Legend colorbar indicates the range of CUE values. (B) The CUE of mono- and cocultures with 14 U2 carbon sources (from left to right, top to down). The x-axis indicates culture conditions, and the y-axis indicates CUEs. ANOVA and Tukey multiple comparisons were performed. Text on boxplot indicates whether significant variances were observed between different cultures."}
+```{r fig4, fig.asp=1,fig.width=8,fig.cap="Figure 4.The initial ratio regulates carbon usage profiles of cocultures. (A) Clustering of carbon source is by usage groups. In the heatmap, the type of carbon sources was indicated by bars on the top, the carbon ID is indicated by the number on the bottom, and experimental replicates are given on the right.The Legend bar indicates the range of CUE values. (B) The CUE of mono- and cocultures with 14 U2 carbon sources (from left to right, top to bottom). The x-axis indicates culture conditions, and the y-axis indicates CUEs. ANOVA and Tukey’s multiple comparisons were performed.The Text on the boxplot indicates whether significant variances were observed between different cultures."}
 plot_grid(ggplotify::as.ggplot(p_heatmap),
           u2_p1,
           labels = "AUTO",ncol=1)
 ggsave("figure 5.tiff",path="figures")
 
-
+export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
 
 ## Figure S4 The results of CUE for all combinations
@@ -861,6 +867,7 @@ ggplot(biolog_24h, aes(ratio0,A590)) +
         strip.background = element_blank(),  # remove facet label - "strip"
         strip.text = element_blank())
 ggsave("figure S3.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
 
 
@@ -877,16 +884,16 @@ plots_proportion <- lapply(list(c("ratio0","social_type"),c("ratio0","usage","so
   df <- merged %>%
     group_by(.dots=x) %>%
     summarise(count=n()) %>%
-    mutate(proportion=count/sum(count)) %>%
-    mutate(label=paste(round(proportion*100),"%",sep=""))
-  ggplot(df,aes_string("ratio0","proportion",fill="social_type")) +
+    mutate(Proportion=count/sum(count)) %>%
+    mutate(label=paste(round(Proportion*100),"%",sep=""))
+  ggplot(df,aes_string("ratio0","Proportion",fill="social_type")) +
     geom_col() +
     geom_text(aes(label=label),color="white",
               position = position_stack(vjust=0.5),
               size=3) +
     scale_fill_manual(values = c("+"="firebrick","-"="royalblue","unresolved"="grey"),
-                      labels = c("unresolved", "positive", "negative"),
-                     name="interaction mode") +
+                      labels = c("Unresolved", "Positive", "Negative"),
+                     name="Interaction mode") +
    theme(legend.position = "none",
           legend.title = element_text(face="bold")) +  
     scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
@@ -903,7 +910,7 @@ plots_population <- lapply(c("EC","PP"),function(x){
   ggplot(merged,aes_string("social_type",x)) + geom_boxplot() +
     stat_compare_means(method = "wilcox.test",comparisons = list(c("unresolved","+"),c("-","+")),size=3)+
     theme(axis.text.x = element_text(angle = 60,hjust = 1,vjust = 1)  ) +
-    scale_x_discrete(labels = c("unresolved","positive","negative"),
+    scale_x_discrete(labels = c("Unresolved","Positive","Negative"),
                      breaks = c("unresolved","+","-")) +
     labs(x="")
 })
@@ -911,7 +918,7 @@ plots_population <- lapply(c("EC","PP"),function(x){
 ```
 
 
-```{r social_vs_groups_barplot,fig.width=8,fig.asp=1,fig.cap="Figure 5. Social interactions in cocultures. (A) overall comparison of interaction mode between three cocultures with all carbon sources. The results were, furthermore, summarized into three parts by the carbon usage groups (B) and preference (C), respectively. Comparison of *E. coli* (D) and *P. putida* (E) quantities in different social interaction modes were showed as well. For A-C, the proportions were colored by interaction mode. For D-E , the x-axis indicates interaction mode, and the y-axis indicates the log10 transformed bacteria quantities of *E. coli* and *P. putida*, respectively."}
+```{r social_vs_groups_barplot,fig.width=8,fig.asp=1,fig.cap="Figure 5. Social interactions in cocultures. (A) overall the comparison of interaction mode between the three cocultures with all carbon sources. The results were, furthermore, summarized into three parts by the carbon usage groups (B) and preference (C). Comparison of *E. coli* (D) and *P. putida* (E) quantities in different social interaction modes are shown as well. For A-C, the proportions were colored by interaction mode. For D-E , the x-axis indicates the interaction mode, and the y-axis indicates the log10 transformed bacteria quantities of *E. coli* and *P. putida*, respectively."}
 
 plot_grid(plot_grid(plots_proportion[[1]],
                     plots_proportion[[2]]+ facet_wrap(~usage ),
@@ -922,14 +929,14 @@ plot_grid(plot_grid(plots_proportion[[1]],
           plot_grid(plots_proportion[[3]] + facet_wrap(~prefer, 
                                                        labeller = labeller(prefer = prefer_labeller)) + 
                       theme(strip.text = element_text(face = "italic")),
-                    plots_population[[1]] + labs(y="quantity of E. coli"),
-                    plots_population[[2]] + labs(y="quantity of P. putida"),
+                    plots_population[[1]] + labs(y="Quantity of E. coli"),
+                    plots_population[[2]] + labs(y="Quantity of P. putida"),
                     labels = c("C","D","E"),
                     ncol = 3,
                     rel_widths = c(5,2,2)),
           ncol = 1)
- ggsave("figure 5.tiff",path="figures")
-
+ggsave("figure 5.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
 
 ```
 
@@ -941,16 +948,16 @@ plots_proportion <- lapply(list(c("ratio0","social_type"),c("ratio0","usage","so
   df <- merged_qpcr %>%
     group_by(.dots=x) %>%
     summarise(count=n()) %>%
-    mutate(proportion=count/sum(count)) %>%
-    mutate(label=paste(round(proportion*100),"%",sep=""))
-  ggplot(df,aes_string("ratio0","proportion",fill="social_type")) +
+    mutate(Proportion=count/sum(count)) %>%
+    mutate(label=paste(round(Proportion*100),"%",sep=""))
+  ggplot(df,aes_string("ratio0","Proportion",fill="social_type")) +
     geom_col() +
     geom_text(aes(label=label),color="white",
               position = position_stack(vjust=0.5),
               size=3) +
     scale_fill_manual(values = c("+"="firebrick","-"="royalblue","unresolved"="grey"),
-                     labels = c("unresolved", "positive", "negative"),
-                     name="interaction mode") +
+                     labels = c("Unresolved", "Positive", "Negative"),
+                     name="Interaction mode") +
    theme(legend.position = "none",
           legend.title = element_text(face="bold")) +  
     scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
@@ -967,7 +974,7 @@ plots_population <- lapply(c("EC","PP"),function(x){
   ggplot(merged_qpcr,aes_string("social_type",x)) + geom_boxplot() +
     stat_compare_means(method = "wilcox.test",comparisons = list(c("unresolved","+"),c("-","+")),size=3)+
     theme(axis.text.x = element_text(angle = 60,hjust = 1,vjust = 1)  ) +
-    scale_x_discrete(labels = c("unresolved","positive","negative"),
+    scale_x_discrete(labels = c("Unresolved","Positive","Negative"),
                      breaks = c("unresolved","+","-")) +
     labs(x="")
 })
@@ -986,13 +993,13 @@ plot_grid(plot_grid(plots_proportion[[1]],
           plot_grid(plots_proportion[[3]] + facet_wrap(~prefer, 
                                                        labeller = labeller(prefer = prefer_labeller)) + 
                       theme(strip.text = element_text(face = "italic")),
-                    plots_population[[1]] + labs(y="quantity of E. coli"),
-                    plots_population[[2]] + labs(y="quantity of P. putida"),
+                    plots_population[[1]] + labs(y="Quantity of E. coli"),
+                    plots_population[[2]] + labs(y="Quantity of P. putida"),
                     labels = c("C","D","E"),
                     ncol = 3,
                     rel_widths = c(5,2,2)),
           ncol = 1)
-# ggsave("figure 5-1.tiff",path="figures")
+#ggsave("figure 5-1.tiff",path="figures")
 
 ```
 
@@ -1007,8 +1014,8 @@ left_join(biolog_coculture_24h,social) %>%
     geom_text(aes(x="less",y=max(A590)*1.1,label=carbon_id),vjust=1,color="grey",size=3) +
     facet_wrap(~carbon_id,ncol=9) + 
     scale_color_manual(values = c("+"="firebrick","-"="royalblue","unresolved"="grey"),
-                      labels = c("negative", "positive","unresolved"),
-                     name="interaction mode: ") +
+                      labels = c("Negative", "Positive","Unresolved"),
+                     name="Interaction mode: ") +
     scale_y_continuous(breaks = c(0,1,2)) +
     scale_x_discrete(breaks=c("less","equal","more"),labels=c("1:1000","1:1","1000:1")) +
     labs(x="",y="CUE") +
@@ -1017,13 +1024,15 @@ left_join(biolog_coculture_24h,social) %>%
           strip.background = element_blank(),  # remove facet label - "strip"
           strip.text = element_blank())
 ggsave("figure S4.tiff",path="figures")
+export::graph2ppt(file="figures.pptx",append=TRUE)
+
 ```
 
 
 # Figure 6. Metabolic coupling in utilizing U2 carbon sources
 
 
-```{r echo=FALSE, fig.cap="Figure 6. Metabolic coupling in utilizing U2 carbon sources. The E. coli monoculture (A) and P. putida monoculture (B) only have a little efficiency on utilizing U2 carbon sources. In a coculture which has less E. coli population, metabolic coupling is hardly to setup as E. coli is the bottle neck to restrict the flow of metabolite (C). While E. coli has an equivalent population to P. putida, the metabolic flow can be established, and lead to high CUE for U2 carbon sources (D)."}
+```{r echo=FALSE, fig.cap="Figure 6. Metabolic coupling in utilizing U2 carbon sources. The E. coli monoculture (A) and P. putida monoculture (B)  have only a little efficiency on utilizing U2 carbon sources. In a coculture  that has a smaller E. coli population, metabolic coupling is difficult to establish, as E. coli is the bottleneck restricting the flow of metabolites(C). When E. coli has an equivalent population to P. putida, metabolic flow can be established, and lead to high CUE for U2 carbon sources (D)."}
 knitr::include_graphics("figures/interaction_model.png")
 ```
 
@@ -1083,10 +1092,10 @@ rm(dat)
 
 ```{r fig.asp=0.8,fig.width=8, fig.cap="Figure S6. A750 growth curve."}
 ggplot( da0_750,aes(time,mean,color=ratio0,shape=ratio0,ymin=mean-std,ymax=mean+std)) + 
-  geom_line(size=0.8) + 
+  geom_line(size=0.6) + 
   geom_errorbar(width=0.1) + 
   geom_point(size=0.8) +
-  xlab("time(h)") + ylab("Growth(A750)") + geom_text(aes(x=2,y=max(mean)*1.1,label=carbon_id),vjust=1,color="grey",size=4)+
+  xlab("Time(h)") + ylab("A750") + geom_text(aes(x=2,y=max(mean)*1.1,label=carbon_id),vjust=1,color="grey",size=4)+
   facet_wrap(~carbon_id,ncol=9) + scale_y_continuous(breaks = c(0,0.5,1)) +
   scale_x_continuous(breaks = seq(0, 24, by = 8), 
                      labels = seq(0, 24, by = 8), 
@@ -1094,7 +1103,7 @@ ggplot( da0_750,aes(time,mean,color=ratio0,shape=ratio0,ymin=mean-std,ymax=mean+
   theme(axis.text = element_text(angle = 0,hjust = 1,vjust = 0.5, size = 10),
         axis.title = element_text(size = 15), ##time(h)
         legend.text = element_text(size = 15), ##1:1, 1:1000
-        legend.title = element_text(size = 15), ##ratio0
+        legend.title= element_blank(), ##ratio0
         #legend.key = element_rect(size = 10), 
         legend.position = "top",
         strip.background = element_blank(),  # remove facet label - "strip"
@@ -1102,10 +1111,10 @@ ggplot( da0_750,aes(time,mean,color=ratio0,shape=ratio0,ymin=mean-std,ymax=mean+
 ```
 ```{r fig.asp=0.8,fig.width=8, fig.cap="Figure S7. A590 growth curve." }
 ggplot( da0_590,aes(time,mean,color=ratio0,shape=ratio0,ymin=mean-std,ymax=mean+std)) + 
-  geom_line(size=0.8) + 
+  geom_line(size=0.6) + 
   geom_errorbar(width=0.1) + 
   geom_point(size=0.8) +
-  xlab("time(h)") + ylab("Growth(A590)") + geom_text(aes(x=2,y=max(mean)*1.1,label=carbon_id),vjust=1,color="grey",size=4)+
+  xlab("Time(h)") + ylab("A590") + geom_text(aes(x=2,y=max(mean)*1.1,label=carbon_id),vjust=1,color="grey",size=4)+
   facet_wrap(~carbon_id,ncol=9) + scale_y_continuous(breaks = c(0,1,2)) +
   scale_x_continuous(breaks = seq(0, 24, by = 8), 
                      labels = seq(0, 24, by = 8), 
@@ -1113,29 +1122,31 @@ ggplot( da0_590,aes(time,mean,color=ratio0,shape=ratio0,ymin=mean-std,ymax=mean+
   theme(axis.text = element_text(angle = 0,hjust = 1,vjust = 0.5, size = 10),
         axis.title = element_text(size = 15), ##time(h)
         legend.text = element_text(size = 15), ##1:1, 1:1000
-        legend.title = element_text(size = 15), ##ratio0
+        legend.title= element_blank(),## remove ratio0
         #legend.key = element_rect(size = 10), 
         legend.position = "top",
+        
         strip.background = element_blank(),  # remove facet label - "strip"
         strip.text = element_blank())
+
+export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
 
 
 ## Correlation of A590 and A750
 
-```{r fig.cap= "Figure S8. The correlation between A590 and A750."}
-ggplot(biolog, aes(A590,A750,color=ratio0)) +
-  geom_point(alpha=1/3,show.legend = F) +
-  scale_color_discrete(name="Initial Ratio") +
-  facet_wrap(~ratio0) +
-  geom_smooth(method = "lm",size=1,show.legend = F) + 
+```{r fig.cap= "Figure S8. The correlation between A590 (x-axis) and A750 (y-axis)."}
+ggplot(biolog, aes(A590,A750)) +
+  geom_point(alpha=1/3) +
+  geom_smooth(method = "lm",size=1)+ 
   stat_smooth_func(geom = "text",method = "lm",parse=T, hjust=0,xpos = 0.25,ypos = 1.4, show.legend = F)
-
+  
+export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
 
 ## CUE of single cell
 
-```{r fig.asp=0.618, fig.cap="Figure S10. CUE of single cells of two species."}
+```{r fig.asp=0.618, fig.cap="Figure S9. The correlation of A590 (y-axis) and log-10 transformed cell quantities (x-axis) in monocultures. Left,*P. putida* monoculture ; right, *E. coli* monoculture."}
 
 mono_data <- mono_data %>% rename( species = Target.Name, quantity = Quantity_mono) %>%  filter(carbon_id!=1) %>%
   ungroup()
@@ -1143,11 +1154,13 @@ mono_data$species <-factor(mono_data$species,
                         levels = c("PP","EC"),
                         labels = c("P. putida","E. coli")) 
 d <- merge( mono_data,biolog_mono_24h, by = c("plate", "species","carbon_id"),all=T) 
-d$logCFU <- log10(d$quantity)
+d$LogCFU <- log10(d$quantity)
 d2<- d[-c(4,74),]
-ggplot(d2, aes(logCFU,A590,color=species)) +
+ggplot(d2, aes(LogCFU,A590,color=species)) +
   geom_point(alpha=1/3,show.legend = F) +facet_wrap(.~species,scales = 'free_x' ) +
+   xlab("Log10(quantity)") + ylab("A590")+
+  theme(strip.text = element_text(face = "italic"))+
   geom_smooth(method = "lm",size=1,show.legend = F) + 
   stat_smooth_func_with_pval(geom = "text",method = "lm",parse=T, hjust=0,xpos=7.0,xpos2 =7.0,ypos=2.0,ypos2 = 1.75, show.legend = F)
-
+export::graph2ppt(file="figures.pptx",append=TRUE)
 ```
