@@ -1,10 +1,8 @@
-The repository [ratio](https://github.com/gaospecial/ratio) contains the supplementary files of a recent manuscript.
+The repository [ratio](https://github.com/gaospecial/ratio) contains the supplementary files of a recent publication.
 
-**Chun-Hui Gao**, Hui Cao, Peng Cai*, Søren J. Sørensen, 
-Dissecting the impact of initial inoculation ratio on the structure, function and interaction in a coculture system.
-~In submission~.
+**Gao, C.-H.**; Cao, H.; Cai, P.; Sørensen, S. J. The Initial Inoculation Ratio Regulates Bacterial Coculture Interactions and Metabolic Capacity. The ISME Journal 2020, 1–12. https://doi.org/10.1038/s41396-020-00751-7.
 
-The codes available here enable reproducible study of the current manuscript. 
+The codes available here enable reproducible study of this paper. 
 
 Please check [figures.rmd](./figures.rmd) and [figures.html](./figures.html) for more information ([preview figures.html](https://htmlpreview.github.io/?https://github.com/gaospecial/ratio/blob/master/figures.html)).
 
