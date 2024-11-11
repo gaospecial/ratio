@@ -1,5 +1,9 @@
-load packages
-=============
+Figures of the Ratio manuscript
+================
+<gaospecial@gmail.com>
+November 11, 2024
+
+# load packages
 
 ``` r
 library(tidyverse)
@@ -12,8 +16,7 @@ library(vegan)
 theme_set(theme_bw())
 ```
 
-读取数据
-========
+# 读取数据
 
 本研究所使用的数据主要来自于两个实验：首先是两个单独培养体系和三个共培养体系在BIOLOG板中含有的71种碳源中的碳源利用情况，其次是三个共培养体系中所含的两个物种的数量。碳源利用情况以A750的吸光值确定，物种数量则由qPCR实验确定。两部分的数据分别保存在“biolog”和“qPCR”数据文件中。
 
@@ -25,7 +28,7 @@ theme_set(theme_bw())
 biolog_24h <- read_csv("data/biolog.csv")
 qPCR_data <- read_csv(file="data/qPCR.csv")
 head(biolog_24h)
-#> # A tibble: 6 x 5
+#> # A tibble: 6 × 5
 #>   ratio0 plate carbon_id  A590  A750
 #>   <chr>  <dbl>     <dbl> <dbl> <dbl>
 #> 1 equal      1         1 0.191 0.138
@@ -35,7 +38,7 @@ head(biolog_24h)
 #> 5 equal      1         5 0.191 0.137
 #> 6 equal      1         6 0.259 0.142
 head(qPCR_data)
-#> # A tibble: 6 x 6
+#> # A tibble: 6 × 6
 #>   ratio0 plate carbon_id         EC         PP   ratio1
 #>   <chr>  <dbl>     <dbl>      <dbl>      <dbl>    <dbl>
 #> 1 less       1        10    177416. 175245243. 0.00101 
@@ -57,7 +60,7 @@ coli* 的定量结果（`EC`），*P. putida*
 ``` r
 carbon_name <- read_csv("data/carbon.csv")
 head(carbon_name)
-#> # A tibble: 6 x 2
+#> # A tibble: 6 × 2
 #>   carbon_id carbon_source
 #>       <dbl> <chr>        
 #> 1         2 Dextrin      
@@ -68,8 +71,7 @@ head(carbon_name)
 #> 6         7 Sucrose
 ```
 
-数据标准化
-----------
+## 数据标准化
 
 ``` r
 qPCR_data <- qPCR_data %>%
@@ -91,8 +93,7 @@ biolog_coculture_24h <- biolog_24h %>%
   mutate(ratio0 = factor(ratio0, levels = c("less","equal","more")))
 ```
 
-对碳源进行聚类
---------------
+## 对碳源进行聚类
 
 定义碳源利用的分组：U1，U2，U3。分组采用了层级聚类方法，将碳源分为三类。参见
 @ref(table1)。
@@ -110,8 +111,7 @@ carbon_group <-  data.frame(usage=k3) %>%
   mutate(usage=paste("U",usage,sep=""))
 ```
 
-定义碳源偏好性
---------------
+## 定义碳源偏好性
 
 根据 *E. coli* 和 *P.putida*
 在单独培养时利用碳源能力的差异，将碳源又分为 *E. coli* 偏好性碳源、 *P.
@@ -138,8 +138,7 @@ carbon_prefer[carbon_prefer$carbon_id %in% EC_prefered$carbon_id,"prefer"] <- "E
 carbon_prefer[carbon_prefer$carbon_id %in% PP_prefered$carbon_id,"prefer"] <- "PP"
 ```
 
-根据碳源利用效率定义相互作用关系
-================================
+# 根据碳源利用效率定义相互作用关系
 
 相互作用通常被认为是物种间的固有属性。负的相互作用可能来自于底物竞争、抗生素的合成等，而正的相互作用可能来自于代谢的耦联等。
 
@@ -147,8 +146,7 @@ carbon_prefer[carbon_prefer$carbon_id %in% PP_prefered$carbon_id,"prefer"] <- "P
 
 <img src="figures/Figure-definition_of_social_type-1.png" width="70%" />
 
-Table 1 碳源及其分类
-====================
+# Table 1 碳源及其分类
 
 Table 1
 包括了实验中的71中碳源的编号、名称，及按照前述分类指标的分类情况。
@@ -161,1022 +159,1746 @@ left_join(carbon_name,carbon_group) %>%
 ```
 
 <table>
+
 <thead>
+
 <tr>
+
 <th style="text-align:right;">
-carbon\_id
+
+carbon_id
 </th>
+
 <th style="text-align:left;">
-carbon\_source
+
+carbon_source
 </th>
+
 <th style="text-align:left;">
+
 usage
 </th>
+
 <th style="text-align:left;">
+
 prefer
 </th>
+
 </tr>
+
 </thead>
+
 <tbody>
+
 <tr>
+
 <td style="text-align:right;">
+
 2
 </td>
+
 <td style="text-align:left;">
+
 Dextrin
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 3
 </td>
+
 <td style="text-align:left;">
+
 D-Maltose
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 4
 </td>
+
 <td style="text-align:left;">
+
 D-Trehalose
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 5
 </td>
+
 <td style="text-align:left;">
+
 D-Cellobiose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 6
 </td>
+
 <td style="text-align:left;">
+
 Gentiobiosse
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 7
 </td>
+
 <td style="text-align:left;">
+
 Sucrose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 8
 </td>
+
 <td style="text-align:left;">
+
 D-Turanose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 9
 </td>
+
 <td style="text-align:left;">
+
 Stachyose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 10
 </td>
+
 <td style="text-align:left;">
+
 D-Raffinose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 11
 </td>
+
 <td style="text-align:left;">
+
 α-D-Lactose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 12
 </td>
+
 <td style="text-align:left;">
+
 D-Melibiose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 13
 </td>
+
 <td style="text-align:left;">
+
 β-Methyl-D-Glucoside
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 14
 </td>
+
 <td style="text-align:left;">
+
 D-Salicin
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 15
 </td>
+
 <td style="text-align:left;">
+
 N-Acetyl-D-Glucosamine
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 16
 </td>
+
 <td style="text-align:left;">
+
 N-Acetyl-β-Dmannosamine
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 17
 </td>
+
 <td style="text-align:left;">
+
 N-Acetyl-D-Galactosamine
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 18
 </td>
+
 <td style="text-align:left;">
+
 N-AcetylNeuraminic Acid
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 19
 </td>
+
 <td style="text-align:left;">
+
 α-D-Glucose
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 20
 </td>
+
 <td style="text-align:left;">
+
 D-Mannose
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 21
 </td>
+
 <td style="text-align:left;">
+
 D-Fructose
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 22
 </td>
+
 <td style="text-align:left;">
+
 D-Galactose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 23
 </td>
+
 <td style="text-align:left;">
+
 3-MethylGlucose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 24
 </td>
+
 <td style="text-align:left;">
+
 D-Fucose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 25
 </td>
+
 <td style="text-align:left;">
+
 L-Fucose
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 26
 </td>
+
 <td style="text-align:left;">
+
 L-Rhamnose
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 27
 </td>
+
 <td style="text-align:left;">
+
 Inosine
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 28
 </td>
+
 <td style="text-align:left;">
+
 D-Sorbitol
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 29
 </td>
+
 <td style="text-align:left;">
+
 D-Mannitol
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 30
 </td>
+
 <td style="text-align:left;">
+
 D-Arabitol
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 31
 </td>
+
 <td style="text-align:left;">
+
 myo-Inositol
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 32
 </td>
+
 <td style="text-align:left;">
+
 Glycerol
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 33
 </td>
+
 <td style="text-align:left;">
+
 D-Glucose-6-PO4
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 34
 </td>
+
 <td style="text-align:left;">
+
 D-Fructose-6-PO4
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 35
 </td>
+
 <td style="text-align:left;">
+
 D-Aspartic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 36
 </td>
+
 <td style="text-align:left;">
+
 D-Serine
 </td>
+
 <td style="text-align:left;">
+
 U2
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 37
 </td>
+
 <td style="text-align:left;">
+
 Gelatin
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 38
 </td>
+
 <td style="text-align:left;">
+
 Glycyl-L-Prolin
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 39
 </td>
+
 <td style="text-align:left;">
+
 L-Alanine
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 40
 </td>
+
 <td style="text-align:left;">
+
 L-Arginine
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 41
 </td>
+
 <td style="text-align:left;">
+
 L-Aspartic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 42
 </td>
+
 <td style="text-align:left;">
+
 L-Glutamic
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 43
 </td>
+
 <td style="text-align:left;">
+
 L-Histidine
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 44
 </td>
+
 <td style="text-align:left;">
+
 L-Pyroglutamic
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 45
 </td>
+
 <td style="text-align:left;">
+
 L-Serine
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 46
 </td>
+
 <td style="text-align:left;">
+
 Pectin
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 EC
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 47
 </td>
+
 <td style="text-align:left;">
+
 D-Galacturonic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 48
 </td>
+
 <td style="text-align:left;">
+
 L-Galactonic Acid Lactone
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 49
 </td>
+
 <td style="text-align:left;">
+
 D-Gluconic
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 50
 </td>
+
 <td style="text-align:left;">
+
 D-Glucuronic
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 51
 </td>
+
 <td style="text-align:left;">
+
 Glucuronamid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 52
 </td>
+
 <td style="text-align:left;">
+
 Mucic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 53
 </td>
+
 <td style="text-align:left;">
+
 Quinic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 54
 </td>
+
 <td style="text-align:left;">
+
 D-Saccharic
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 55
 </td>
+
 <td style="text-align:left;">
+
 p-Hydroxy-Phenylacetic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 56
 </td>
+
 <td style="text-align:left;">
+
 Methyl Pyruvate
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 57
 </td>
+
 <td style="text-align:left;">
+
 D-Lactic Acid Methyl Ester
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 58
 </td>
+
 <td style="text-align:left;">
+
 L-Lactic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 59
 </td>
+
 <td style="text-align:left;">
+
 Citric Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 60
 </td>
+
 <td style="text-align:left;">
+
 α-Keto-Glutaric Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 61
 </td>
+
 <td style="text-align:left;">
+
 D-Malic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 62
 </td>
+
 <td style="text-align:left;">
+
 L-Malic Acid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 63
 </td>
+
 <td style="text-align:left;">
+
 Bromo-Succinic
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 64
 </td>
+
 <td style="text-align:left;">
+
 Tween 40
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 65
 </td>
+
 <td style="text-align:left;">
+
 y-Amino-ButryricAcid
 </td>
+
 <td style="text-align:left;">
+
 U3
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 66
 </td>
+
 <td style="text-align:left;">
+
 α-Hydroxy-ButyricAcid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 67
 </td>
+
 <td style="text-align:left;">
+
 β-Hydroxy-D,L-ButyricAcid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 68
 </td>
+
 <td style="text-align:left;">
+
 α-Keto-ButyricAcid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 69
 </td>
+
 <td style="text-align:left;">
+
 Acetoacetic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 70
 </td>
+
 <td style="text-align:left;">
+
 Propionic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 PP
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 71
 </td>
+
 <td style="text-align:left;">
+
 Acetic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:right;">
+
 72
 </td>
+
 <td style="text-align:left;">
+
 Formic Acid
 </td>
+
 <td style="text-align:left;">
+
 U1
 </td>
+
 <td style="text-align:left;">
+
 none
 </td>
+
 </tr>
+
 </tbody>
+
 </table>
 
-Figure 2 共培养体系中最终比例的差异
-===================================
+# Figure 2 共培养体系中最终比例的差异
 
 Figure 2 主要展示了共培养体系中最终比例的差异。最终比例以 *E. coli* 与
 *P. putida* 定量结果的比值为依据。采用 **ANOVA**
@@ -1224,6 +1946,22 @@ plots <- lapply(list(p1,p2),function(x){
 
 
 plot_grid(plotlist = plots,ncol=1,labels="AUTO")
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <ce>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <b1>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <ce>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <b1>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <ce>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <b1>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <ce>
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : conversion failure on 'α-D-Glucose' in 'mbcsToSbcs': dot
+#> substituted for <b1>
 ```
 
 <img src="figures/Figure-unnamed-chunk-5-1.png" width="70%" />
@@ -1263,8 +2001,7 @@ print(p2,vp=vp)
 
 <img src="figures/Figure-unnamed-chunk-7-1.png" width="70%" />
 
-Figure S2. Final ratios of all cultures
-=======================================
+# Figure S2. Final ratios of all cultures
 
 与@ref(fig2) 对应，Figure S2展示了全部共培养体系的最终比例差异。
 
@@ -1286,8 +2023,7 @@ ggplot(qPCR_data,aes(ratio0,ratio1)) + geom_boxplot() +
 
 <img src="figures/Figure-unnamed-chunk-8-1.png" width="70%" />
 
-Figure 3. 碳源偏好性对共培养体系最终比例的影响
-==============================================
+# Figure 3. 碳源偏好性对共培养体系最终比例的影响
 
 Figure 3展示了碳源偏好性对共培养体系最终比例的影响。
 
@@ -1343,8 +2079,7 @@ plot_grid(gp,plot_grid(p1,p2,labels = c("B","C"),ncol = 2),labels = c("A",""),nc
 
 <img src="figures/Figure-unnamed-chunk-11-1.png" width="70%" />
 
-Figure 4. 初始比例对共培养体系代谢能力的调控
-============================================
+# Figure 4. 初始比例对共培养体系代谢能力的调控
 
 在接下来的分析中，我们把三个共培养体系视为一个简单的合成群落，通过分析群落对71种碳源的利用能力比较群落功能的差异。
 
@@ -1445,8 +2180,7 @@ plot_grid(plot_grid(p_cue,p_pca,ncol = 2,labels = c("A","B")),
 
 <img src="figures/Figure-unnamed-chunk-15-1.png" width="70%" />
 
-Figure 5. Final ratio and CUE in U2 carbon sources
-==================================================
+# Figure 5. Final ratio and CUE in U2 carbon sources
 
 由于U2类碳源表现了独特现象。我们列出U2类碳源中的CUE和最终比例。
 
@@ -1510,8 +2244,7 @@ plot_grid(u2_p1,u2_p2,labels = "AUTO",ncol=1)
 
 <img src="figures/Figure-fig5-1.png" width="70%" />
 
-Figure S3 所有体系的 CUE
-========================
+# Figure S3 所有体系的 CUE
 
 与@ref(fig:fig5) 对应，Figure S3展示了所有的CUE利用情况及差异。
 
@@ -1532,11 +2265,9 @@ ggplot(biolog_24h, aes(ratio0,A750)) +
 
 <img src="figures/Figure-unnamed-chunk-19-1.png" width="70%" />
 
-Figure 6. 初始比例对相互作用的影响
-==================================
+# Figure 6. 初始比例对相互作用的影响
 
-计算相互作用类型
-----------------
+## 计算相互作用类型
 
 定义相互作用的类型。首先，根据 monoculture 的 CUE 和 coculture
 中的物种比例，计算理论值。然后，拿理论CUE值与实际测得的值进行比较，从而确定相互作用类型。
@@ -1603,6 +2334,16 @@ plots <- lapply(list(c("ratio0","social_type"),c("ratio0","usage","social_type")
           legend.title = element_text(face="bold")) +
     xlab("") 
 })
+#> Warning: The `.dots` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+#> ℹ The deprecated feature was likely used in the dplyr package.
+#>   Please report the issue at <https://github.com/tidyverse/dplyr/issues>.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+#> ℹ Please use tidy evaluation idioms with `aes()`.
+#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 
 legend <- get_legend(plots[[1]] + theme(legend.position = c(0.5,0.7)))
 ```
@@ -1618,8 +2359,7 @@ plot_grid(plot_grid(blank, plots[[1]], legend, rel_widths = c(0.3,0.8,0.7),ncol=
 
 <img src="figures/Figure-social_vs_groups_barplot-1.png" width="70%" />
 
-Figure S4 所有体系中的相互作用类型
-==================================
+# Figure S4 所有体系中的相互作用类型
 
 Figure S4 与 Figure 6 对应，展示所有组合中的相互作用类型。
 
